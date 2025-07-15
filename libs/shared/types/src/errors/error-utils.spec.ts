@@ -28,15 +28,15 @@ describe('ErrorUtils', () => {
     });
   });
 
-  describe('getExceptionMessages', () => {
+  describe('getErrorMessages', () => {
     test('should return empty array for null', () => {
-      expect(ErrorUtils.getExceptionMessages(null)).toEqual([]);
+      expect(ErrorUtils.getErrorMessages(null)).toEqual([]);
     });
 
     test('should handle simple throwable', () => {
-      expect(ErrorUtils.getExceptionMessages(new Error())).toEqual(['Error']);
-      expect(ErrorUtils.getExceptionMessages(new Error('msg'))).toEqual(['Error(msg)']);
-      expect(ErrorUtils.getExceptionMessages(new Error(''))).toEqual(['Error']);
+      expect(ErrorUtils.getErrorMessages(new Error())).toEqual(['Error']);
+      expect(ErrorUtils.getErrorMessages(new Error('msg'))).toEqual(['Error(msg)']);
+      expect(ErrorUtils.getErrorMessages(new Error(''))).toEqual(['Error']);
     });
 
     test('should handle nested exceptions', () => {
@@ -44,7 +44,7 @@ describe('ErrorUtils', () => {
       const parent = new Error();
       parent.cause = nested;
 
-      expect(ErrorUtils.getExceptionMessages(parent)).toEqual([
+      expect(ErrorUtils.getErrorMessages(parent)).toEqual([
         'Error(Error)',
         'Error'
       ]);
@@ -55,7 +55,7 @@ describe('ErrorUtils', () => {
       const parent = new Error();
       parent.cause = nested;
 
-      expect(ErrorUtils.getExceptionMessages(parent)).toEqual([
+      expect(ErrorUtils.getErrorMessages(parent)).toEqual([
         'Error(Error)',
         'Error(state)'
       ]);
@@ -68,7 +68,7 @@ describe('ErrorUtils', () => {
       const top = new Error();
       top.cause = middle;
 
-      expect(ErrorUtils.getExceptionMessages(top)).toEqual([
+      expect(ErrorUtils.getErrorMessages(top)).toEqual([
         'Error(Error)',
         'Error(state)',
         'TypeError(not allowed)'
@@ -82,7 +82,7 @@ describe('ErrorUtils', () => {
       const top = new Error();
       top.cause = middle;
 
-      expect(ErrorUtils.getExceptionMessages(top)).toEqual([
+      expect(ErrorUtils.getErrorMessages(top)).toEqual([
         'Error(Error)',
         'Error(TypeError)',
         'TypeError(not allowed)'
@@ -90,15 +90,15 @@ describe('ErrorUtils', () => {
     });
   });
 
-  describe('getExceptionMessages with addClassName=false', () => {
+  describe('getErrorMessages with addClassName=false', () => {
     test('should return empty array for null', () => {
-      expect(ErrorUtils.getExceptionMessages(null, false)).toEqual([]);
+      expect(ErrorUtils.getErrorMessages(null, false)).toEqual([]);
     });
 
     test('should handle simple throwable without class names', () => {
-      expect(ErrorUtils.getExceptionMessages(new Error(), false)).toEqual(['Error']);
-      expect(ErrorUtils.getExceptionMessages(new Error('msg'), false)).toEqual(['msg']);
-      expect(ErrorUtils.getExceptionMessages(new Error(''), false)).toEqual(['Error']);
+      expect(ErrorUtils.getErrorMessages(new Error(), false)).toEqual(['Error']);
+      expect(ErrorUtils.getErrorMessages(new Error('msg'), false)).toEqual(['msg']);
+      expect(ErrorUtils.getErrorMessages(new Error(''), false)).toEqual(['Error']);
     });
 
     test('should handle nested exceptions without class prefix', () => {
@@ -106,7 +106,7 @@ describe('ErrorUtils', () => {
       const parent = new Error();
       parent.cause = nested;
 
-      expect(ErrorUtils.getExceptionMessages(parent, false)).toEqual([
+      expect(ErrorUtils.getErrorMessages(parent, false)).toEqual([
         'Error',
         'Error'
       ]);
@@ -117,7 +117,7 @@ describe('ErrorUtils', () => {
       const parent = new Error();
       parent.cause = nested;
 
-      expect(ErrorUtils.getExceptionMessages(parent, false)).toEqual([
+      expect(ErrorUtils.getErrorMessages(parent, false)).toEqual([
         'Error',
         'state'
       ]);
@@ -130,7 +130,7 @@ describe('ErrorUtils', () => {
       const top = new Error();
       top.cause = middle;
 
-      expect(ErrorUtils.getExceptionMessages(top, false)).toEqual([
+      expect(ErrorUtils.getErrorMessages(top, false)).toEqual([
         'Error',
         'state',
         'not allowed'
@@ -144,7 +144,7 @@ describe('ErrorUtils', () => {
       const top = new Error();
       top.cause = middle;
 
-      expect(ErrorUtils.getExceptionMessages(top, false)).toEqual([
+      expect(ErrorUtils.getErrorMessages(top, false)).toEqual([
         'Error',
         'Error',
         'not allowed'
@@ -152,16 +152,14 @@ describe('ErrorUtils', () => {
     });
   });
 
-  describe('getExceptionClassNames and getExceptionFullClassNames', () => {
+  describe('getErrorClassNames and getExceptionFullClassNames', () => {
     test('should return empty array for null', () => {
-      expect(ErrorUtils.getExceptionClassNames(null)).toEqual([]);
-      expect(ErrorUtils.getExceptionFullClassNames(null)).toEqual([]);
+      expect(ErrorUtils.getErrorClassNames(null)).toEqual([]);
     });
 
     test('should return class names for single exception', () => {
       const error = new Error();
-      expect(ErrorUtils.getExceptionClassNames(error)).toEqual(['Error']);
-      expect(ErrorUtils.getExceptionFullClassNames(error)).toEqual(['Error']);
+      expect(ErrorUtils.getErrorClassNames(error)).toEqual(['Error']);
     });
 
     test('should return class names for exception chain', () => {
@@ -169,8 +167,7 @@ describe('ErrorUtils', () => {
       const parent = new TypeError();
       parent.cause = nested;
 
-      expect(ErrorUtils.getExceptionClassNames(parent)).toEqual(['TypeError', 'Error']);
-      expect(ErrorUtils.getExceptionFullClassNames(parent)).toEqual(['TypeError', 'Error']);
+      expect(ErrorUtils.getErrorClassNames(parent)).toEqual(['TypeError', 'Error']);
     });
 
     test('should handle complex exception chain class names', () => {
@@ -180,12 +177,7 @@ describe('ErrorUtils', () => {
       const top = new ReferenceError();
       top.cause = middle;
 
-      expect(ErrorUtils.getExceptionClassNames(top)).toEqual([
-        'ReferenceError',
-        'Error', 
-        'TypeError'
-      ]);
-      expect(ErrorUtils.getExceptionFullClassNames(top)).toEqual([
+      expect(ErrorUtils.getErrorClassNames(top)).toEqual([
         'ReferenceError',
         'Error',
         'TypeError'
@@ -207,7 +199,7 @@ describe('ErrorUtils', () => {
       const topError = new Error();
       topError.cause = new ExceptionWithSelfCause('Self');
 
-      expect(ErrorUtils.getExceptionMessages(topError)).toEqual([
+      expect(ErrorUtils.getErrorMessages(topError)).toEqual([
         'Error(ExceptionWithSelfCause)',
         'ExceptionWithSelfCause(Self)',
         'Error(internal self)'
@@ -215,14 +207,14 @@ describe('ErrorUtils', () => {
     });
   });
 
-  describe('getNotEmptyMessageOrExceptionClassSimpleName', () => {
+  describe('getNotEmptyMessageOrErrorClassSimpleName', () => {
     test('should return message if not empty', () => {
-      expect(ErrorUtils.getNotEmptyMessageOrExceptionClassSimpleName(new Error('msg'))).toBe('msg');
+      expect(ErrorUtils.getNotEmptyMessageOrErrorClassSimpleName(new Error('msg'))).toBe('msg');
     });
 
     test('should return class name if message is null/empty', () => {
-      expect(ErrorUtils.getNotEmptyMessageOrExceptionClassSimpleName(new Error())).toBe('Error');
-      expect(ErrorUtils.getNotEmptyMessageOrExceptionClassSimpleName(new Error(''))).toBe('Error');
+      expect(ErrorUtils.getNotEmptyMessageOrErrorClassSimpleName(new Error())).toBe('Error');
+      expect(ErrorUtils.getNotEmptyMessageOrErrorClassSimpleName(new Error(''))).toBe('Error');
     });
   });
 
@@ -261,13 +253,13 @@ describe('ErrorUtils', () => {
     test('should throw BusinessRuleError for null/empty/whitespace ids', () => {
       expect(() => ErrorUtils.trimAndValidateId(null as any, 'testId')).toThrow(BusinessRuleError);
       expect(() => ErrorUtils.trimAndValidateId(null as any, 'testId')).toThrow('[BAD_REQUEST_GENERAL] Expected not empty testId');
-      
+
       expect(() => ErrorUtils.trimAndValidateId('', 'testId')).toThrow(BusinessRuleError);
       expect(() => ErrorUtils.trimAndValidateId('', 'testId')).toThrow('[BAD_REQUEST_GENERAL] Expected not empty testId');
-      
+
       expect(() => ErrorUtils.trimAndValidateId(' ', 'testId')).toThrow(BusinessRuleError);
       expect(() => ErrorUtils.trimAndValidateId(' ', 'testId')).toThrow('[BAD_REQUEST_GENERAL] Expected not empty testId');
-      
+
       expect(() => ErrorUtils.trimAndValidateId(' \r\n\t', 'testId')).toThrow(BusinessRuleError);
       expect(() => ErrorUtils.trimAndValidateId(' \r\n\t', 'testId')).toThrow('[BAD_REQUEST_GENERAL] Expected not empty testId');
     });
@@ -297,20 +289,20 @@ describe('ErrorUtils', () => {
 
   describe('toBusinessRuleError', () => {
     test('should handle null ErrorDto', () => {
-      const result = ErrorUtils.toBusinessRuleException(null);
+      const result = ErrorUtils.toBusinessRuleError(null);
       expect(result).toBeInstanceOf(BusinessRuleError);
       expect(result.message).toBe('[INTERNAL_SERVER_ERROR_GENERAL] Unknown error');
     });
 
     test('should handle null ErrorDto with message', () => {
-      const result = ErrorUtils.toBusinessRuleException(null, 'Error message');
+      const result = ErrorUtils.toBusinessRuleError(null, 'Error message');
       expect(result).toBeInstanceOf(BusinessRuleError);
       expect(result.message).toBe('[INTERNAL_SERVER_ERROR_GENERAL] Error message');
     });
 
     test('should handle ErrorDto with default values', () => {
       const errorDto = ErrorDtoBuilder.create().build();
-      const result = ErrorUtils.toBusinessRuleException(errorDto, 'Error message');
+      const result = ErrorUtils.toBusinessRuleError(errorDto, 'Error message');
       expect(result).toBeInstanceOf(BusinessRuleError);
       expect(result.message).toBe('[INTERNAL_SERVER_ERROR_GENERAL] Error message');
     });
@@ -319,7 +311,7 @@ describe('ErrorUtils', () => {
       const errorDto = ErrorDtoBuilder.create(
         GeneralErrorCodeImpl.from(GeneralErrorCode.NOT_FOUND_GENERAL)
       ).build();
-      const result = ErrorUtils.toBusinessRuleException(errorDto, 'Error message');
+      const result = ErrorUtils.toBusinessRuleError(errorDto, 'Error message');
       expect(result).toBeInstanceOf(BusinessRuleError);
       expect(result.message).toBe('[NOT_FOUND_GENERAL] Error message');
     });
@@ -330,7 +322,7 @@ describe('ErrorUtils', () => {
       )
         .withErrorDetails(['error 1'])
         .build();
-      const result = ErrorUtils.toBusinessRuleException(errorDto, '');
+      const result = ErrorUtils.toBusinessRuleError(errorDto, '');
       expect(result).toBeInstanceOf(BusinessRuleError);
       expect(result.message).toBe('[NOT_FOUND_GENERAL] error 1');
     });
@@ -341,51 +333,51 @@ describe('ErrorUtils', () => {
       )
         .withErrorDetails(['error 1', 'error 2'])
         .build();
-      const result = ErrorUtils.toBusinessRuleException(errorDto, '');
+      const result = ErrorUtils.toBusinessRuleError(errorDto, '');
       expect(result).toBeInstanceOf(BusinessRuleError);
       expect(result.message).toBe('[NOT_FOUND_GENERAL] error 1, error 2');
     });
 
     test('should handle HTTP status codes', () => {
-      let result = ErrorUtils.toBusinessRuleException(400, '');
+      let result = ErrorUtils.toBusinessRuleError(400, '');
       expect(result).toBeInstanceOf(BusinessRuleError);
       expect(result.message).toBe('[BAD_REQUEST_GENERAL] Unknown error');
 
-      result = ErrorUtils.toBusinessRuleException(400, null as any);
+      result = ErrorUtils.toBusinessRuleError(400, null as any);
       expect(result).toBeInstanceOf(BusinessRuleError);
       expect(result.message).toBe('[BAD_REQUEST_GENERAL] Unknown error');
 
-      result = ErrorUtils.toBusinessRuleException(400, 'Bad request');
+      result = ErrorUtils.toBusinessRuleError(400, 'Bad request');
       expect(result).toBeInstanceOf(BusinessRuleError);
       expect(result.message).toBe('[BAD_REQUEST_GENERAL] Bad request');
     });
 
     test('should handle JSON error messages', () => {
-      const result = ErrorUtils.toBusinessRuleException(401, '{"error": "Error message custom"}');
+      const result = ErrorUtils.toBusinessRuleError(401, '{"error": "Error message custom"}');
       expect(result).toBeInstanceOf(BusinessRuleError);
       expect(result.message).toBe('[UNAUTHORIZED_GENERAL] Error message custom');
     });
 
     test('should handle JSON with message field', () => {
-      const result = ErrorUtils.toBusinessRuleException(404, '{"message": "Message custom"}');
+      const result = ErrorUtils.toBusinessRuleError(404, '{"message": "Message custom"}');
       expect(result).toBeInstanceOf(BusinessRuleError);
       expect(result.message).toBe('[NOT_FOUND_GENERAL] Message custom');
     });
 
     test('should handle JSON with both error and message fields', () => {
-      const result = ErrorUtils.toBusinessRuleException(404, '{"error": "Error", "message": "Message custom"}');
+      const result = ErrorUtils.toBusinessRuleError(404, '{"error": "Error", "message": "Message custom"}');
       expect(result).toBeInstanceOf(BusinessRuleError);
       expect(result.message).toBe('[NOT_FOUND_GENERAL] Error, Message custom');
     });
 
     test('should handle JSON with unknown fields', () => {
-      const result = ErrorUtils.toBusinessRuleException(404, '{"custom": "Custom", "message": "Message custom"}');
+      const result = ErrorUtils.toBusinessRuleError(404, '{"custom": "Custom", "message": "Message custom"}');
       expect(result).toBeInstanceOf(BusinessRuleError);
       expect(result.message).toContain('[NOT_FOUND_GENERAL] {"custom": "Custom", "message": "Message custom"}');
     });
 
     test('should handle formatting in error message', () => {
-      const result = ErrorUtils.toBusinessRuleException(null, 'Error message %s');
+      const result = ErrorUtils.toBusinessRuleError(null, 'Error message %s');
       expect(result).toBeInstanceOf(BusinessRuleError);
       expect(result.message).toBe('[INTERNAL_SERVER_ERROR_GENERAL] Error message %s');
     });

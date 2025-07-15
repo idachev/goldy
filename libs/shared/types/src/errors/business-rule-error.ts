@@ -10,32 +10,19 @@ export class BusinessRuleError extends Error {
     originalMessage: string,
     timestamp: Date = new Date()
   ) {
-    const formattedMessage = originalMessage 
-      ? `[${errorCode.errorID()}] ${originalMessage}`
-      : `[${errorCode.errorID()}]`;
-    
+    const formattedMessage = originalMessage
+      ? `[${errorCode.errorId()}] ${originalMessage}`
+      : `[${errorCode.errorId()}]`;
+
     super(formattedMessage);
-    
+
     this.name = 'BusinessRuleError';
     this.errorCode = errorCode;
     this.originalMessage = originalMessage;
     this.timestamp = timestamp;
 
-    // Maintains proper stack trace for where our error was thrown (only available on V8)
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, BusinessRuleError);
     }
-  }
-
-  toJSON() {
-    return {
-      name: this.name,
-      message: this.message,
-      errorCode: this.errorCode.errorCode(),
-      errorID: this.errorCode.errorID(),
-      originalMessage: this.originalMessage,
-      timestamp: this.timestamp,
-      stack: this.stack,
-    };
   }
 }

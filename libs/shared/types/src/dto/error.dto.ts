@@ -5,7 +5,7 @@ export interface ErrorDto {
   timestamp: Date;
   httpStatus: number;
   errorCode: number;
-  errorID: string;
+  errorId: string;
   errorDetails: string[];
 }
 
@@ -15,7 +15,7 @@ export class ErrorDtoBuilder {
   private errorDetails: string[] = [];
 
   constructor(errorCode?: ErrorCode) {
-    this.errorCode = errorCode || 
+    this.errorCode = errorCode ||
       GeneralErrorCodeImpl.from(GeneralErrorCode.INTERNAL_SERVER_ERROR_GENERAL);
   }
 
@@ -50,7 +50,7 @@ export class ErrorDtoBuilder {
       timestamp: this.timestamp,
       httpStatus,
       errorCode: this.errorCode.errorCode(),
-      errorID: this.errorCode.errorID(),
+      errorId: this.errorCode.errorId(),
       errorDetails: this.errorDetails,
     };
   }

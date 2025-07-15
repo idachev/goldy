@@ -4,15 +4,14 @@ import { BusinessRuleError } from './business-rule-error';
 import { ErrorDto, ErrorDtoBuilder } from '../dto/error.dto';
 import { IDUtils, StringUtils } from '@goldy/shared/utils';
 
-export interface ExceptionMessageExtractor<T extends Error> {
-  getExceptionClass(): new (...args: any[]) => T;
+export interface ErrorMessageExtractor<T extends Error> {
+  getErrorClass(): new (...args: any[]) => T;
   getErrorCode(error: T): ErrorCode;
   getMessage(error: T): string;
 }
 
-export interface ExceptionErrorInfo {
+export interface ErrorInfo {
   classNames: string[];
-  fullClassNames: string[];
   messages: string[];
   errorCodes: ErrorCode[];
 }
@@ -22,15 +21,15 @@ export class ErrorUtils {
   public static readonly JSON_RESPONSE_ERROR_KEY = 'error';
   public static readonly DEFAULT_MAX_ID_SIZE = IDUtils.DEFAULT_MAX_ID_SIZE;
 
-  private static readonly classToExceptionMessageExtractor = new Map<
+  private static readonly classToErrorMessageExtractor = new Map<
     new (...args: any[]) => Error,
-    ExceptionMessageExtractor<any>
+    ErrorMessageExtractor<any>
   >();
 
   static {
     // Register default extractors
-    this.registerExceptionMessageExtractor({
-      getExceptionClass: () => BusinessRuleError,
+    this.registerErrorMessageExtractor({
+      getErrorClass: () => BusinessRuleError,
       getErrorCode: (error: BusinessRuleError) => error.errorCode,
       getMessage: (error: BusinessRuleError) => error.originalMessage,
     });
@@ -53,41 +52,31 @@ export class ErrorUtils {
     return null;
   }
 
-  public static getExceptionClassNames(error: Error | null): string[] {
+  public static getErrorClassNames(error: Error | null): string[] {
     if (!error) return [];
-    return this.getExceptionErrorInfo(error, false).classNames;
+    return this.getErrorInfo(error, false).classNames;
   }
 
-  public static getExceptionFullClassNames(error: Error | null): string[] {
+  public static getErrorMessages(error: Error | null, addClassNameToMessage: boolean = true): string[] {
     if (!error) return [];
-    return this.getExceptionErrorInfo(error, false).fullClassNames;
+    return this.getErrorInfo(error, addClassNameToMessage).messages;
   }
 
-  public static getExceptionMessages(error: Error | null, addClassNameToMessage: boolean = true): string[] {
-    if (!error) return [];
-    return this.getExceptionErrorInfo(error, addClassNameToMessage).messages;
-  }
-
-  public static getNotEmptyMessageOrExceptionClassSimpleName(error: Error): string {
+  public static getNotEmptyMessageOrErrorClassSimpleName(error: Error): string {
     const message = StringUtils.trimToEmpty(error.message);
     return message || error.constructor.name;
   }
 
-  public static registerExceptionMessageExtractors(extractors: ExceptionMessageExtractor<any>[]): void {
+  public static registerErrorMessageExtractors(extractors: ErrorMessageExtractor<any>[]): void {
     extractors.forEach(extractor => {
-      this.registerExceptionMessageExtractor(extractor);
+      this.registerErrorMessageExtractor(extractor);
     });
   }
 
-  public static registerExceptionMessageExtractor(extractor: ExceptionMessageExtractor<any>): void {
-    this.classToExceptionMessageExtractor.set(extractor.getExceptionClass(), extractor);
-  }
-
-  public static getExceptionErrorInfo(error: Error, addClassNameToMessage: boolean): ExceptionErrorInfo {
+  public static getErrorInfo(error: Error, addClassNameToMessage: boolean): ErrorInfo {
     const errors = this.getErrorChain(error);
 
     const classNames: string[] = [];
-    const fullClassNames: string[] = [];
     const messages: string[] = [];
     const errorCodes: ErrorCode[] = [];
 
@@ -108,20 +97,24 @@ export class ErrorUtils {
 
       const className = err.constructor.name;
       classNames.push(className);
-      fullClassNames.push(className); // In JS, we use simple names
 
       if (addClassNameToMessage) {
-        // For nested exceptions, show the parent's message if current has no message
         if (message) {
           messages.push(`${className}(${message})`);
+
         } else if (index < errors.length - 1) {
-          // Has a cause, show the cause's class name
+
           const nextError = errors[index + 1];
+
           messages.push(`${className}(${nextError.constructor.name})`);
+
         } else {
+
           messages.push(className);
         }
+
       } else {
+
         if (message) {
           messages.push(message);
         } else {
@@ -130,17 +123,17 @@ export class ErrorUtils {
       }
     });
 
-    return { classNames, fullClassNames, messages, errorCodes };
+    return { classNames, messages, errorCodes };
   }
 
   private static resolveExtractorForClass(
     errorClass: new (...args: any[]) => Error
-  ): ExceptionMessageExtractor<any> | null {
-    let extractor = this.classToExceptionMessageExtractor.get(errorClass);
+  ): ErrorMessageExtractor<any> | null {
+    let extractor = this.classToErrorMessageExtractor.get(errorClass);
 
     if (!extractor) {
       // Check for inheritance
-      for (const [registeredClass, registeredExtractor] of this.classToExceptionMessageExtractor.entries()) {
+      for (const [registeredClass, registeredExtractor] of this.classToErrorMessageExtractor.entries()) {
         if (errorClass.prototype instanceof registeredClass) {
           extractor = registeredExtractor;
           break;
@@ -151,18 +144,12 @@ export class ErrorUtils {
     return extractor || null;
   }
 
-  public static registerExceptionMessageExtractor<T extends Error>(
-    extractor: ExceptionMessageExtractor<T>
+  public static registerErrorMessageExtractor<T extends Error>(
+    extractor: ErrorMessageExtractor<T>
   ): void {
-    this.classToExceptionMessageExtractor.set(extractor.getExceptionClass(), extractor);
+    this.classToErrorMessageExtractor.set(extractor.getErrorClass(), extractor);
   }
 
-  public static getNotEmptyMessageOrExceptionClassSimpleName(error: Error): string {
-    const message = StringUtils.trimToEmpty(error.message || '');
-    return message || error.constructor.name;
-  }
-
-  // Validation utilities
   public static isValidArgument(condition: boolean, message: string, ...args: any[]): void {
     this.isValid(
       condition,
@@ -227,16 +214,14 @@ export class ErrorUtils {
     return trimmedIdValue;
   }
 
-  public static toBusinessRuleException(httpStatus: number, errorResponse: string): BusinessRuleError;
-  public static toBusinessRuleException(errorDto: ErrorDto | null, errorMessage?: string): BusinessRuleError;
-  public static toBusinessRuleException(httpStatusOrDto: number | ErrorDto | null, errorResponseOrMessage?: string): BusinessRuleError {
+  public static toBusinessRuleError(httpStatusOrDto: number | ErrorDto | null, errorResponseOrMessage?: string): BusinessRuleError {
     if (typeof httpStatusOrDto === 'number') {
-      return this.toBusinessRuleError(httpStatusOrDto, errorResponseOrMessage || '');
+      return this.toBusinessRuleErrorFromStatus(httpStatusOrDto, errorResponseOrMessage);
     }
     return this.toBusinessRuleErrorFromDto(httpStatusOrDto, errorResponseOrMessage);
   }
 
-  public static toBusinessRuleError(httpStatus: number, errorResponse: string): BusinessRuleError {
+  public static toBusinessRuleErrorFromStatus(httpStatus: number, errorResponse?: string): BusinessRuleError {
     const trimmedResponse = StringUtils.trimToEmpty(errorResponse);
 
     let errorData: any = null;
@@ -248,13 +233,11 @@ export class ErrorUtils {
 
     let errorDto: ErrorDto | null = null;
 
-    // Try to parse as ErrorDto
     if (errorData && typeof errorData === 'object' &&
         'errorCode' in errorData && 'httpStatus' in errorData) {
       errorDto = errorData as ErrorDto;
     }
 
-    // Handle simple message/error responses
     if (!errorDto && errorData && typeof errorData === 'object') {
       const errorCode = GeneralErrorCodeImpl.errorCodeFromHttpStatus(httpStatus);
 
@@ -265,9 +248,11 @@ export class ErrorUtils {
         errorDto = ErrorDtoBuilder.create(errorCode)
           .withErrorDetails([String(errorMsg)])
           .build();
+
       } else if (Object.keys(errorData).length === 2 &&
                  this.JSON_RESPONSE_MESSAGE_KEY in errorData &&
                  this.JSON_RESPONSE_ERROR_KEY in errorData) {
+
         const message = String(errorData[this.JSON_RESPONSE_MESSAGE_KEY]);
         const error = String(errorData[this.JSON_RESPONSE_ERROR_KEY]);
 
@@ -277,9 +262,9 @@ export class ErrorUtils {
       }
     }
 
-    // Fallback to default error
     if (!errorDto) {
       const defaultErrorCode = GeneralErrorCodeImpl.errorCodeFromHttpStatus(httpStatus);
+
       errorDto = ErrorDtoBuilder.create(defaultErrorCode)
         .withErrorDetails([trimmedResponse || 'Unknown error'])
         .build();
@@ -315,7 +300,6 @@ export class ErrorUtils {
     return new BusinessRuleError(errorCode, message, errorDto.timestamp);
   }
 
-  // Helper methods
   private static getErrorChain(error: Error): Error[] {
     const chain: Error[] = [];
     const visited = new Set<Error>();
@@ -331,6 +315,6 @@ export class ErrorUtils {
   }
 
   private static formatMessage(template: string, ...args: any[]): string {
-    return template.replace(/%s/g, () => String(args.shift() || ''));
+    return template.replace(/%s/g, () => String(args.shift() ?? ''));
   }
 }

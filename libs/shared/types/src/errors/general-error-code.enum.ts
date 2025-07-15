@@ -76,7 +76,7 @@ export class GeneralErrorCodeImpl implements ErrorCode {
     return this.value;
   }
 
-  errorID(): string {
+  errorId(): string {
     return this.name;
   }
 
@@ -120,7 +120,7 @@ export class GeneralErrorCodeImpl implements ErrorCode {
     let httpStatus = this.INTERNAL_SERVER_ERROR_HTTP_STATUS;
     const httpStatusFromValue = Math.floor(value / this.HTTP_STATUS_ERROR_CODE_BASE);
 
-    if (httpStatusFromValue >= this.HTTP_STATUS_MIN_VALUE && 
+    if (httpStatusFromValue >= this.HTTP_STATUS_MIN_VALUE &&
         httpStatusFromValue <= this.HTTP_STATUS_MAX_VALUE) {
       httpStatus = httpStatusFromValue;
     } else if (fail) {

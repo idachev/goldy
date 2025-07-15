@@ -27,7 +27,7 @@ describe('ErrorDto', () => {
       expect(result.timestamp.getTime()).toBeLessThanOrEqual(afterTime.getTime());
       expect(result.httpStatus).toBe(500);
       expect(result.errorCode).toBe(5009999);
-      expect(result.errorID).toBe('INTERNAL_SERVER_ERROR_GENERAL');
+      expect(result.errorId).toBe('INTERNAL_SERVER_ERROR_GENERAL');
       expect(result.errorDetails).toEqual([]);
     });
 
@@ -42,7 +42,7 @@ describe('ErrorDto', () => {
       expect(result.timestamp.getTime()).toBeLessThanOrEqual(afterTime.getTime());
       expect(result.httpStatus).toBe(404);
       expect(result.errorCode).toBe(4049999);
-      expect(result.errorID).toBe('NOT_FOUND_GENERAL');
+      expect(result.errorId).toBe('NOT_FOUND_GENERAL');
       expect(result.errorDetails).toEqual([]);
     });
 
@@ -59,7 +59,7 @@ describe('ErrorDto', () => {
       expect(result.timestamp.getTime()).toBeLessThanOrEqual(afterTime.getTime());
       expect(result.httpStatus).toBe(502);
       expect(result.errorCode).toBe(5029999);
-      expect(result.errorID).toBe('BAD_GATEWAY_GENERAL');
+      expect(result.errorId).toBe('BAD_GATEWAY_GENERAL');
       expect(result.errorDetails).toEqual(ERROR_DETAILS);
     });
   });
@@ -69,7 +69,7 @@ describe('ErrorDto', () => {
       expect(testModel.timestamp).toEqual(TEST_DATE_20220905_081555_789);
       expect(testModel.httpStatus).toBe(400);
       expect(testModel.errorCode).toBe(4009999);
-      expect(testModel.errorID).toBe('BAD_REQUEST_GENERAL');
+      expect(testModel.errorId).toBe('BAD_REQUEST_GENERAL');
       expect(testModel.errorDetails).toEqual(ERROR_DETAILS);
     });
   });
@@ -82,14 +82,14 @@ describe('ErrorDto', () => {
       expect(parsed.timestamp).toBe('2022-05-09T08:15:55.789Z');
       expect(parsed.httpStatus).toBe(400);
       expect(parsed.errorCode).toBe(4009999);
-      expect(parsed.errorID).toBe('BAD_REQUEST_GENERAL');
+      expect(parsed.errorId).toBe('BAD_REQUEST_GENERAL');
       expect(parsed.errorDetails).toEqual(ERROR_DETAILS);
     });
 
     test('should deserialize from JSON correctly', () => {
       const jsonString = JSON.stringify(testModel);
       const parsed = JSON.parse(jsonString);
-      
+
       // Convert timestamp back to Date object
       const reconstructed: ErrorDto = {
         ...parsed,
@@ -99,7 +99,7 @@ describe('ErrorDto', () => {
       expect(reconstructed.timestamp).toEqual(TEST_DATE_20220905_081555_789);
       expect(reconstructed.httpStatus).toBe(400);
       expect(reconstructed.errorCode).toBe(4009999);
-      expect(reconstructed.errorID).toBe('BAD_REQUEST_GENERAL');
+      expect(reconstructed.errorId).toBe('BAD_REQUEST_GENERAL');
       expect(reconstructed.errorDetails).toEqual(ERROR_DETAILS);
     });
   });
