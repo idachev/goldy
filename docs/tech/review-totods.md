@@ -1,7 +1,10 @@
 # Review TODOs
 
 - [ ] Fix in all use cases to throw BusinessRuleError when validation fails for required fields
-- [ ]  check and use sprintf-js lib instead of formatMessage in error-utils.ts 
+- [ ] check and use sprintf-js lib instead of formatMessage in error-utils.ts 
+- [ ] Check how to add sonar qube static analysis to the project
+- [ ] Add on each git commit to do prettier and eslint checks
+- [ ] Add GitHub actions to run tests on each PR and push to main branch
 
 # DONE
 - [x] Implement error handling add custom exception for business use cases called BusinessRuleError, It should have these fields:

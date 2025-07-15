@@ -1,6 +1,7 @@
 import { describe, test, expect, beforeEach } from '@jest/globals';
 import { ErrorDto, ErrorDtoBuilder } from './error.dto';
 import { GeneralErrorCode, GeneralErrorCodeImpl } from '../errors/general-error-code.enum';
+import { BusinessRuleError } from '../errors/business-rule-error';
 
 describe('ErrorDto', () => {
   const TEST_DATE_20220905_081555_789 = new Date(1652084155789);
@@ -143,6 +144,38 @@ describe('ErrorDto', () => {
 
         expect(result.httpStatus).toBe(expectedStatus);
       });
+    });
+  });
+
+  describe('fromBusinessRuleError', () => {
+    test('should convert BusinessRuleError to ErrorDto', () => {
+      const businessRuleError = new BusinessRuleError(
+        GeneralErrorCodeImpl.from(GeneralErrorCode.NOT_FOUND_GENERAL),
+        'User %s not found',
+        'john123'
+      );
+
+      const errorDto = ErrorDtoBuilder.fromBusinessRuleError(businessRuleError);
+
+      expect(errorDto.timestamp).toEqual(businessRuleError.timestamp);
+      expect(errorDto.httpStatus).toBe(404);
+      expect(errorDto.errorCode).toBe(4049999);
+      expect(errorDto.errorId).toBe('NOT_FOUND_GENERAL');
+      expect(errorDto.errorDetails).toEqual(['User john123 not found']);
+    });
+
+    test('should handle BusinessRuleError with empty message', () => {
+      const businessRuleError = new BusinessRuleError(
+        GeneralErrorCodeImpl.from(GeneralErrorCode.FORBIDDEN_GENERAL),
+        ''
+      );
+
+      const errorDto = ErrorDtoBuilder.fromBusinessRuleError(businessRuleError);
+
+      expect(errorDto.httpStatus).toBe(403);
+      expect(errorDto.errorCode).toBe(4039999);
+      expect(errorDto.errorId).toBe('FORBIDDEN_GENERAL');
+      expect(errorDto.errorDetails).toEqual([]);
     });
   });
 });

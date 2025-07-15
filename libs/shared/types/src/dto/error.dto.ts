@@ -1,5 +1,6 @@
 import { ErrorCode } from '../errors/error-code.interface';
 import { GeneralErrorCode, GeneralErrorCodeImpl } from '../errors/general-error-code.enum';
+import { BusinessRuleError } from '../errors/business-rule-error';
 
 export interface ErrorDto {
   timestamp: Date;
@@ -21,6 +22,16 @@ export class ErrorDtoBuilder {
 
   static create(errorCode?: ErrorCode): ErrorDtoBuilder {
     return new ErrorDtoBuilder(errorCode);
+  }
+
+  static fromBusinessRuleError(error: BusinessRuleError): ErrorDto {
+    return {
+      timestamp: error.timestamp,
+      httpStatus: GeneralErrorCodeImpl.httpStatusFromValue(error.errorCode.errorCode()),
+      errorCode: error.errorCode.errorCode(),
+      errorId: error.errorCode.errorId(),
+      errorDetails: error.originalMessage ? [error.originalMessage] : [],
+    };
   }
 
   withTimestamp(timestamp: Date): ErrorDtoBuilder {

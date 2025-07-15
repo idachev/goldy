@@ -382,4 +382,29 @@ describe('ErrorUtils', () => {
       expect(result.message).toBe('[INTERNAL_SERVER_ERROR_GENERAL] Error message %s');
     });
   });
+
+  describe('sprintf formatting', () => {
+    test('should format various placeholders correctly', () => {
+      expect(() => ErrorUtils.isValidArgument(
+        false, 
+        'User %s with ID %d has balance $%.2f and data: %j',
+        'John Doe',
+        12345,
+        1234.567,
+        { status: 'active' }
+      )).toThrow('[BAD_REQUEST_GENERAL] User John Doe with ID 12345 has balance $1234.57 and data: {"status":"active"}');
+    });
+
+    test('BusinessRuleError constructor should support sprintf formatting', () => {
+      const error = new BusinessRuleError(
+        GeneralErrorCodeImpl.from(GeneralErrorCode.NOT_FOUND_GENERAL),
+        'Resource %s with ID %d not found',
+        'User',
+        42
+      );
+      
+      expect(error.message).toBe('[NOT_FOUND_GENERAL] Resource User with ID 42 not found');
+      expect(error.originalMessage).toBe('Resource User with ID 42 not found');
+    });
+  });
 });

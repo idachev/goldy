@@ -1,4 +1,5 @@
 import { ErrorCode } from './error-code.interface';
+import { sprintf } from 'sprintf-js';
 
 export class BusinessRuleError extends Error {
   public readonly errorCode: ErrorCode;
@@ -7,19 +8,22 @@ export class BusinessRuleError extends Error {
 
   constructor(
     errorCode: ErrorCode,
-    originalMessage: string,
-    timestamp: Date = new Date()
+    message: string,
+    ...args: any[]
   ) {
-    const formattedMessage = originalMessage
-      ? `[${errorCode.errorId()}] ${originalMessage}`
+    // Format the message using sprintf if there are format arguments
+    const formattedOriginalMessage = args.length > 0 ? sprintf(message, ...args) : message;
+    
+    const formattedMessage = formattedOriginalMessage
+      ? `[${errorCode.errorId()}] ${formattedOriginalMessage}`
       : `[${errorCode.errorId()}]`;
 
     super(formattedMessage);
 
     this.name = 'BusinessRuleError';
     this.errorCode = errorCode;
-    this.originalMessage = originalMessage;
-    this.timestamp = timestamp;
+    this.originalMessage = formattedOriginalMessage;
+    this.timestamp = new Date();
 
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, BusinessRuleError);

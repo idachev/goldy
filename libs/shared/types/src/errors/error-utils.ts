@@ -3,6 +3,7 @@ import { GeneralErrorCode, GeneralErrorCodeImpl } from './general-error-code.enu
 import { BusinessRuleError } from './business-rule-error';
 import { ErrorDto, ErrorDtoBuilder } from '../dto/error.dto';
 import { IDUtils, StringUtils } from '@goldy/shared/utils';
+import { sprintf } from 'sprintf-js';
 
 export interface ErrorMessageExtractor<T extends Error> {
   getErrorClass(): new (...args: any[]) => T;
@@ -186,9 +187,22 @@ export class ErrorUtils {
     );
   }
 
+  /**
+   * Validates a condition and throws a BusinessRuleError with formatted message if false.
+   * Uses sprintf-js for message formatting with support for:
+   * - %s: string
+   * - %d: integer
+   * - %f: float (use %.2f for 2 decimal places)
+   * - %j: JSON
+   * - %o: object inspection
+   * 
+   * @example
+   * ErrorUtils.isValid(false, errorCode, 'User %s has %d items', 'John', 5);
+   * // Throws: User John has 5 items
+   */
   private static isValid(condition: boolean, errorCode: ErrorCode, message: string, ...args: any[]): void {
     if (!condition) {
-      const formattedMessage = this.formatMessage(message, ...args);
+      const formattedMessage = sprintf(message, ...args);
       throw new BusinessRuleError(errorCode, formattedMessage);
     }
   }
@@ -297,7 +311,10 @@ export class ErrorUtils {
       message = errorDto.errorDetails.join(', ');
     }
 
-    return new BusinessRuleError(errorCode, message, errorDto.timestamp);
+    const error = new BusinessRuleError(errorCode, message);
+    // Replace timestamp with the one from DTO
+    (error as any).timestamp = errorDto.timestamp;
+    return error;
   }
 
   private static getErrorChain(error: Error): Error[] {
@@ -314,7 +331,4 @@ export class ErrorUtils {
     return chain;
   }
 
-  private static formatMessage(template: string, ...args: any[]): string {
-    return template.replace(/%s/g, () => String(args.shift() ?? ''));
-  }
 }
