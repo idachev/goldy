@@ -1,5 +1,5 @@
-import { AssetType } from '../enums/asset-type.enum';
-import { MetalType } from '../enums/metal-type.enum';
+import { AssetType } from '../enums/asset-type.enum.js';
+import { MetalType } from '../enums/metal-type.enum.js';
 
 export interface AssetDto {
   id: string;

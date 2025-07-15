@@ -1,5 +1,5 @@
-import { AssetDto } from './asset.dto';
-import { DealerDto } from './dealer.dto';
+import { AssetDto } from './asset.dto.js';
+import { DealerDto } from './dealer.dto.js';
 
 export interface AssetListingDto {
   id: string;

@@ -1,4 +1,4 @@
-import { AssetType } from '../enums/asset-type.enum';
+import { AssetType } from '../enums/asset-type.enum.js';
 
 export interface DealerDto {
   id: string;
