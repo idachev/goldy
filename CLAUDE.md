@@ -12,6 +12,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npx nx build frontend` - Build frontend for production
 - `npx nx typecheck` - Run TypeScript type checking across workspace
 
+### Code Quality
+
+- `npm run lint` - Run ESLint to check code quality and style
+- `npm run lint:fix` - Run ESLint with auto-fix for fixable issues
+- `npm run format` - Format code with Prettier
+- `npm run format:check` - Check code formatting without making changes
+
 ### Testing
 
 - `npx nx test backend-e2e` - Run backend end-to-end tests (Jest)
@@ -121,6 +128,74 @@ Follows clean architecture with domain-driven design:
 
 # Development Guidelines
 
+## Validation and Error Handling
+
+### Use Case Validation Pattern
+
+When implementing validation in use cases, follow these patterns:
+
+1. **Import Validation Functions**: Use destructured imports for cleaner code:
+
+```typescript
+import { ErrorUtils } from '@goldy/shared/types';
+import { IDUtils } from '@goldy/shared/utils';
+
+const { isValidArgument } = ErrorUtils;
+const { isValidId } = IDUtils;
+```
+
+2. **Validation Style**: Use one-line validation calls that throw BusinessRuleError on failure:
+
+```typescript
+// For ID validation
+isValidArgument(isValidId(id), 'Invalid dealer ID format');
+
+// For required fields
+isValidArgument(!!dealerData.name?.trim(), 'Dealer name is required');
+isValidArgument(!!dealerData.websiteUrl?.trim(), 'Website URL is required');
+```
+
+3. **Method Formatting**: Add blank lines for better readability:
+
+```typescript
+async getDealerById(id: string): Promise<DealerDto | null> {
+  isValidArgument(isValidId(id), 'Invalid dealer ID format');
+
+  const dealer = await this.dealerRepository.findById(id);
+
+  return dealer ? this.mapToDto(dealer) : null;
+}
+```
+
+### Available Validation Methods
+
+1. **isValidArgument** - For general validation (throws BAD_REQUEST_GENERAL):
+
+   ```typescript
+   isValidArgument(!!value, 'Value is required');
+   isValidArgument(value > 0, 'Value must be positive');
+   isValidArgument(isValidId(id), 'Invalid ID format');
+   ```
+
+2. **isFoundResource** - For resource existence checks (throws NOT_FOUND_GENERAL):
+
+   ```typescript
+   const asset = await assetRepository.findById(id);
+   isFoundResource(!!asset, 'Asset not found with ID: %s', id);
+   ```
+
+3. **isAllowed** - For permission checks (throws FORBIDDEN_GENERAL)
+4. **isConflict** - For conflict validation (throws CONFLICT_GENERAL)
+
+### Key Points:
+
+- Use `isValidArgument` with condition checks for automatic BusinessRuleError throwing
+- Use `isFoundResource` when checking if a resource exists after database queries
+- Prefer `isValidId` from IDUtils for ID validation
+- Add blank lines after validation, after main logic, and before return statements
+- Keep validation concise and readable with destructured imports
+- Always run `npm run lint` after making changes to ensure code quality
+
 ## Test Source Organization
 
 In NX monorepos with NestJS applications, the community has converged on several established patterns for organizing Jest test files. Here are the most widely adopted approaches:
@@ -200,3 +275,8 @@ This structure aligns with clean architecture principles by maintaining clear bo
 The co-location pattern is particularly effective in NX monorepos because it leverages NX's affected computation capabilities, running only tests for changed code paths.
 
 This approach has become the de facto standard in the NestJS community and is well-supported by NX tooling and IDE integrations.
+
+## Project Specific Instructions
+
+Important !!! DO NOT add additional code explanation summary unless requested by the user.
+After working on files, just stop or state "ALL TASKS DONE" if all tasks are completed.

@@ -1,9 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { AssetListingDto } from '@goldy/shared/types';
+import { ErrorUtils } from '@goldy/shared/types';
+import { IDUtils } from '@goldy/shared/utils';
 import { AssetListingRepository } from '../../infrastructure/database/typeorm/repositories/asset-listing.repository';
 import { AssetRepository } from '../../infrastructure/database/typeorm/repositories/asset.repository';
 import { DealerRepository } from '../../infrastructure/database/typeorm/repositories/dealer.repository';
 import { AssetListing } from '../../domain/entities/asset-listing.entity';
+
+const { isValidArgument, isFoundResource } = ErrorUtils;
+const { isValidId } = IDUtils;
 
 @Injectable()
 export class ManageAssetListingsUseCase {
@@ -19,17 +24,26 @@ export class ManageAssetListingsUseCase {
   }
 
   async getListingById(id: string): Promise<AssetListingDto | null> {
+    isValidArgument(isValidId(id), 'Invalid listing ID format');
+
     const listing = await this.assetListingRepository.findById(id);
+
     return listing ? this.mapToDto(listing) : null;
   }
 
   async getListingsByAssetId(assetId: string): Promise<AssetListingDto[]> {
+    isValidArgument(isValidId(assetId), 'Invalid asset ID format');
+
     const listings = await this.assetListingRepository.findByAssetId(assetId);
+
     return listings.map(this.mapToDto);
   }
 
   async getListingsByDealerId(dealerId: string): Promise<AssetListingDto[]> {
+    isValidArgument(isValidId(dealerId), 'Invalid dealer ID format');
+
     const listings = await this.assetListingRepository.findByDealerId(dealerId);
+
     return listings.map(this.mapToDto);
   }
 
@@ -44,12 +58,29 @@ export class ManageAssetListingsUseCase {
     productLink: string;
     isActive?: boolean;
   }): Promise<AssetListingDto | null> {
+    isValidArgument(isValidId(listingData.assetId), 'Invalid asset ID format');
+    isValidArgument(
+      isValidId(listingData.dealerId),
+      'Invalid dealer ID format'
+    );
+    isValidArgument(
+      !!listingData.productLink?.trim(),
+      'Product link is required'
+    );
+
     const asset = await this.assetRepository.findById(listingData.assetId);
     const dealer = await this.dealerRepository.findById(listingData.dealerId);
 
-    if (!asset || !dealer) {
-      return null;
-    }
+    isFoundResource(
+      !!asset,
+      'Asset not found with ID: %s',
+      listingData.assetId
+    );
+    isFoundResource(
+      !!dealer,
+      'Dealer not found with ID: %s',
+      listingData.dealerId
+    );
 
     const listing = await this.assetListingRepository.create({
       asset,
@@ -68,11 +99,16 @@ export class ManageAssetListingsUseCase {
       isActive: boolean;
     }>
   ): Promise<AssetListingDto | null> {
+    isValidArgument(isValidId(id), 'Invalid listing ID format');
+
     const listing = await this.assetListingRepository.update(id, updates);
+
     return listing ? this.mapToDto(listing) : null;
   }
 
   async deleteListing(id: string): Promise<boolean> {
+    isValidArgument(isValidId(id), 'Invalid listing ID format');
+
     return this.assetListingRepository.delete(id);
   }
 

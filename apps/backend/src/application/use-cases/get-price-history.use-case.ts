@@ -1,9 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PriceRecordDto } from '@goldy/shared/types';
-import { PriceCalculator } from '@goldy/shared/utils';
+import { ErrorUtils } from '@goldy/shared/types';
+import { PriceCalculator, IDUtils } from '@goldy/shared/utils';
 import { PriceRecordRepository } from '../../infrastructure/database/typeorm/repositories/price-record.repository';
 import { PriceRecord } from '../../domain/entities/price-record.entity';
 import { AssetListing } from '../../domain/entities/asset-listing.entity';
+
+const { isValidArgument } = ErrorUtils;
+const { isValidId } = IDUtils;
 
 @Injectable()
 export class GetPriceHistoryUseCase {
@@ -15,25 +19,40 @@ export class GetPriceHistoryUseCase {
   }
 
   async getPriceRecordById(id: string): Promise<PriceRecordDto | null> {
+    isValidArgument(isValidId(id), 'Invalid price record ID format');
+
     const record = await this.priceRecordRepository.findById(id);
+
     return record ? this.mapToDto(record) : null;
   }
 
   async getPriceHistoryByListingId(
     assetListingId: string
   ): Promise<PriceRecordDto[]> {
+    isValidArgument(
+      isValidId(assetListingId),
+      'Invalid asset listing ID format'
+    );
+
     const records = await this.priceRecordRepository.findByAssetListingId(
       assetListingId
     );
+
     return records.map(this.mapToDto);
   }
 
   async getLatestPriceByListingId(
     assetListingId: string
   ): Promise<PriceRecordDto | null> {
+    isValidArgument(
+      isValidId(assetListingId),
+      'Invalid asset listing ID format'
+    );
+
     const record = await this.priceRecordRepository.findLatestByAssetListingId(
       assetListingId
     );
+
     return record ? this.mapToDto(record) : null;
   }
 
@@ -41,10 +60,21 @@ export class GetPriceHistoryUseCase {
     startDate: Date,
     endDate: Date
   ): Promise<PriceRecordDto[]> {
+    isValidArgument(
+      startDate instanceof Date,
+      'Start date must be a valid Date'
+    );
+    isValidArgument(endDate instanceof Date, 'End date must be a valid Date');
+    isValidArgument(
+      startDate <= endDate,
+      'Start date must be before or equal to end date'
+    );
+
     const records = await this.priceRecordRepository.findByDateRange(
       startDate,
       endDate
     );
+
     return records.map(this.mapToDto);
   }
 
@@ -62,6 +92,23 @@ export class GetPriceHistoryUseCase {
     deliveryDays?: number;
     inStock?: boolean;
   }): Promise<PriceRecordDto> {
+    isValidArgument(
+      isValidId(priceData.assetListingId),
+      'Invalid asset listing ID format'
+    );
+    isValidArgument(
+      !priceData.sellPrice || priceData.sellPrice > 0,
+      'Sell price must be greater than zero'
+    );
+    isValidArgument(
+      !priceData.buyPrice || priceData.buyPrice > 0,
+      'Buy price must be greater than zero'
+    );
+    isValidArgument(
+      !priceData.spotPrice || priceData.spotPrice > 0,
+      'Spot price must be greater than zero'
+    );
+
     const premiumPercent =
       priceData.sellPrice && priceData.spotPrice
         ? PriceCalculator.calculatePremiumPercent(
@@ -87,6 +134,8 @@ export class GetPriceHistoryUseCase {
   }
 
   async deletePriceRecord(id: string): Promise<boolean> {
+    isValidArgument(isValidId(id), 'Invalid price record ID format');
+
     return this.priceRecordRepository.delete(id);
   }
 
