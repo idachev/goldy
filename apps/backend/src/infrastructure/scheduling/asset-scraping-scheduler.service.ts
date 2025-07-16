@@ -31,7 +31,6 @@ export class AssetScrapingSchedulerService {
     }
   }
 
-
   async triggerManualScraping(): Promise<{
     success: number;
     failed: number;
@@ -57,10 +56,12 @@ export class AssetScrapingSchedulerService {
 
   async triggerListingScraping(listingId: string): Promise<boolean> {
     this.logger.log(`Starting manual scraping for listing: ${listingId}`);
-    
+
     try {
       const result = await this.scraperService.scrapeListing(listingId);
-      this.logger.log(`Manual listing scraping completed: ${result ? 'success' : 'failed'}`);
+      this.logger.log(
+        `Manual listing scraping completed: ${result ? 'success' : 'failed'}`
+      );
       return result;
     } catch (error) {
       this.logger.error(`Error during manual listing scraping:`, error);
@@ -71,5 +72,4 @@ export class AssetScrapingSchedulerService {
   getScrapingStatus(): { isRunning: boolean } {
     return { isRunning: this.isRunning };
   }
-
 }

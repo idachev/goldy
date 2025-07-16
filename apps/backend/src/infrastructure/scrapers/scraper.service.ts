@@ -1,7 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { IScraperStrategy } from './strategies/scraper.strategy.interface';
 import { AssetListingRepository } from '../database/typeorm/repositories/asset-listing.repository';
-import { PriceRecordRepository } from '../database/typeorm/repositories/price-record.repository';
 import { GetPriceHistoryUseCase } from '../../application/use-cases/get-price-history.use-case';
 
 @Injectable()
@@ -11,7 +10,7 @@ export class ScraperService {
 
   constructor(
     private readonly assetListingRepository: AssetListingRepository,
-    private readonly priceHistoryUseCase: GetPriceHistoryUseCase,
+    private readonly priceHistoryUseCase: GetPriceHistoryUseCase
   ) {}
 
   registerStrategy(strategy: IScraperStrategy): void {
@@ -24,7 +23,9 @@ export class ScraperService {
     results: Array<{ listingId: string; success: boolean; error?: string }>;
   }> {
     const activeListings = await this.assetListingRepository.findForScraping();
-    this.logger.log(`Starting scrape for ${activeListings.length} active listings`);
+    this.logger.log(
+      `Starting scrape for ${activeListings.length} active listings`
+    );
 
     const results = [];
     let success = 0;
@@ -38,10 +39,10 @@ export class ScraperService {
           results.push({ listingId: listing.id, success: true });
         } else {
           failed++;
-          results.push({ 
-            listingId: listing.id, 
-            success: false, 
-            error: 'No suitable scraper strategy found' 
+          results.push({
+            listingId: listing.id,
+            success: false,
+            error: 'No suitable scraper strategy found',
           });
         }
       } catch (error) {
@@ -71,7 +72,9 @@ export class ScraperService {
 
     const strategy = this.findStrategy(listing.dealer.name);
     if (!strategy) {
-      this.logger.warn(`No scraper strategy found for dealer: ${listing.dealer.name}`);
+      this.logger.warn(
+        `No scraper strategy found for dealer: ${listing.dealer.name}`
+      );
       return false;
     }
 
@@ -91,19 +94,26 @@ export class ScraperService {
       // Update last scraped timestamp
       await this.assetListingRepository.updateLastScrapedAt(listingId);
 
-      this.logger.log(`Successfully scraped and saved price for listing ${listingId}`);
+      this.logger.log(
+        `Successfully scraped and saved price for listing ${listingId}`
+      );
       return true;
     } catch (error) {
-      this.logger.error(`Error processing scraped data for listing ${listingId}:`, error);
+      this.logger.error(
+        `Error processing scraped data for listing ${listingId}:`,
+        error
+      );
       return false;
     }
   }
 
   private findStrategy(dealerName: string): IScraperStrategy | null {
-    return this.strategies.find(strategy => strategy.canHandle(dealerName)) || null;
+    return (
+      this.strategies.find((strategy) => strategy.canHandle(dealerName)) || null
+    );
   }
 
   private async delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }

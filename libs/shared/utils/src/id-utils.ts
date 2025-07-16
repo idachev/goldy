@@ -34,7 +34,7 @@ export class IDUtils {
     try {
       const bytes = base32.decode(base32Uuid.toUpperCase());
       return this.byteArrayToUuid(new Uint8Array(bytes));
-    } catch (error) {
+    } catch {
       throw new Error(`Invalid Base32 UUID: ${base32Uuid}`);
     }
   }
@@ -50,7 +50,7 @@ export class IDUtils {
     try {
       const bytes = this.uuidToByteArray(uuid);
       return base32.encode(bytes).replace(/=/g, '').toUpperCase();
-    } catch (error) {
+    } catch {
       throw new Error(`Invalid UUID: ${uuid}`);
     }
   }
@@ -86,7 +86,7 @@ export class IDUtils {
     }
 
     const hex = Array.from(bytes)
-      .map(b => b.toString(16).padStart(2, '0'))
+      .map((b) => b.toString(16).padStart(2, '0'))
       .join('');
 
     return [
@@ -101,11 +101,16 @@ export class IDUtils {
   /**
    * Validate if a string is a valid ID
    */
-  public static isValidId(id: string, expectedMaxSize: number = this.DEFAULT_MAX_ID_SIZE): boolean {
-    return id != null && 
-           id.length > 0 && 
-           id.length <= expectedMaxSize && 
-           this.REGEXP_MATCH_VALID_ID.test(id);
+  public static isValidId(
+    id: string,
+    expectedMaxSize: number = this.DEFAULT_MAX_ID_SIZE
+  ): boolean {
+    return (
+      id != null &&
+      id.length > 0 &&
+      id.length <= expectedMaxSize &&
+      this.REGEXP_MATCH_VALID_ID.test(id)
+    );
   }
 
   /**
@@ -120,8 +125,9 @@ export class IDUtils {
    */
   public static isValidUuid(uuid: string): boolean {
     if (!uuid) return false;
-    
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     return uuidRegex.test(uuid);
   }
 
@@ -131,5 +137,4 @@ export class IDUtils {
   public static generateShortId(): string {
     return this.uuidToBase32RandomLowerCase();
   }
-
 }

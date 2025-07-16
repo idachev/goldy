@@ -65,10 +65,7 @@ export class GeneralErrorCodeImpl implements ErrorCode {
     }
   }
 
-  constructor(
-    private readonly value: number,
-    private readonly name: string
-  ) {
+  constructor(private readonly value: number, private readonly name: string) {
     this.validateErrorCode(value, GeneralErrorCodeImpl.GENERAL_ERROR_CODE_BASE);
   }
 
@@ -82,10 +79,14 @@ export class GeneralErrorCodeImpl implements ErrorCode {
 
   static from(value: number, logWarning: boolean = true): ErrorCode {
     if (this._map.has(value)) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       return this._map.get(value)!;
     }
 
-    if (value >= this.HTTP_STATUS_MIN_VALUE && value <= this.HTTP_STATUS_MAX_VALUE) {
+    if (
+      value >= this.HTTP_STATUS_MIN_VALUE &&
+      value <= this.HTTP_STATUS_MAX_VALUE
+    ) {
       return this.errorCodeFromHttpStatus(value);
     }
 
@@ -93,6 +94,7 @@ export class GeneralErrorCodeImpl implements ErrorCode {
       console.warn(`Failed to find error code for: ${value}`);
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return this._map.get(GeneralErrorCode.INTERNAL_SERVER_ERROR_GENERAL)!;
   }
 
@@ -113,15 +115,22 @@ export class GeneralErrorCodeImpl implements ErrorCode {
   }
 
   static httpStatusFromValue(value: number, fail: boolean = false): number {
-    if (value >= this.HTTP_STATUS_MIN_VALUE && value <= this.HTTP_STATUS_MAX_VALUE) {
+    if (
+      value >= this.HTTP_STATUS_MIN_VALUE &&
+      value <= this.HTTP_STATUS_MAX_VALUE
+    ) {
       return value;
     }
 
     let httpStatus = this.INTERNAL_SERVER_ERROR_HTTP_STATUS;
-    const httpStatusFromValue = Math.floor(value / this.HTTP_STATUS_ERROR_CODE_BASE);
+    const httpStatusFromValue = Math.floor(
+      value / this.HTTP_STATUS_ERROR_CODE_BASE
+    );
 
-    if (httpStatusFromValue >= this.HTTP_STATUS_MIN_VALUE &&
-        httpStatusFromValue <= this.HTTP_STATUS_MAX_VALUE) {
+    if (
+      httpStatusFromValue >= this.HTTP_STATUS_MIN_VALUE &&
+      httpStatusFromValue <= this.HTTP_STATUS_MAX_VALUE
+    ) {
       httpStatus = httpStatusFromValue;
     } else if (fail) {
       throw new Error(
@@ -134,6 +143,9 @@ export class GeneralErrorCodeImpl implements ErrorCode {
 
   static errorCodeFromHttpStatus(httpStatus: number): ErrorCode {
     const errorCodeValue = httpStatus * this.HTTP_STATUS_ERROR_CODE_BASE + 9999;
-    return new GeneralErrorCodeImpl(errorCodeValue, `HTTP_${httpStatus}_GENERAL`);
+    return new GeneralErrorCodeImpl(
+      errorCodeValue,
+      `HTTP_${httpStatus}_GENERAL`
+    );
   }
 }

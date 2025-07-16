@@ -3,6 +3,7 @@ import { PriceRecordDto } from '@goldy/shared/types';
 import { PriceCalculator } from '@goldy/shared/utils';
 import { PriceRecordRepository } from '../../infrastructure/database/typeorm/repositories/price-record.repository';
 import { PriceRecord } from '../../domain/entities/price-record.entity';
+import { AssetListing } from '../../domain/entities/asset-listing.entity';
 
 @Injectable()
 export class GetPriceHistoryUseCase {
@@ -18,18 +19,32 @@ export class GetPriceHistoryUseCase {
     return record ? this.mapToDto(record) : null;
   }
 
-  async getPriceHistoryByListingId(assetListingId: string): Promise<PriceRecordDto[]> {
-    const records = await this.priceRecordRepository.findByAssetListingId(assetListingId);
+  async getPriceHistoryByListingId(
+    assetListingId: string
+  ): Promise<PriceRecordDto[]> {
+    const records = await this.priceRecordRepository.findByAssetListingId(
+      assetListingId
+    );
     return records.map(this.mapToDto);
   }
 
-  async getLatestPriceByListingId(assetListingId: string): Promise<PriceRecordDto | null> {
-    const record = await this.priceRecordRepository.findLatestByAssetListingId(assetListingId);
+  async getLatestPriceByListingId(
+    assetListingId: string
+  ): Promise<PriceRecordDto | null> {
+    const record = await this.priceRecordRepository.findLatestByAssetListingId(
+      assetListingId
+    );
     return record ? this.mapToDto(record) : null;
   }
 
-  async getPricesByDateRange(startDate: Date, endDate: Date): Promise<PriceRecordDto[]> {
-    const records = await this.priceRecordRepository.findByDateRange(startDate, endDate);
+  async getPricesByDateRange(
+    startDate: Date,
+    endDate: Date
+  ): Promise<PriceRecordDto[]> {
+    const records = await this.priceRecordRepository.findByDateRange(
+      startDate,
+      endDate
+    );
     return records.map(this.mapToDto);
   }
 
@@ -47,12 +62,18 @@ export class GetPriceHistoryUseCase {
     deliveryDays?: number;
     inStock?: boolean;
   }): Promise<PriceRecordDto> {
-    const premiumPercent = priceData.sellPrice && priceData.spotPrice
-      ? PriceCalculator.calculatePremiumPercent(priceData.sellPrice, priceData.spotPrice)
-      : undefined;
+    const premiumPercent =
+      priceData.sellPrice && priceData.spotPrice
+        ? PriceCalculator.calculatePremiumPercent(
+            priceData.sellPrice,
+            priceData.spotPrice
+          )
+        : undefined;
 
+    // TODO: This should ideally fetch the full AssetListing entity first
+    // For now, we're passing a partial object with just the ID
     const record = await this.priceRecordRepository.create({
-      assetListing: { id: priceData.assetListingId } as any,
+      assetListing: { id: priceData.assetListingId } as AssetListing,
       sellPrice: priceData.sellPrice,
       buyPrice: priceData.buyPrice,
       spotPrice: priceData.spotPrice,
@@ -68,7 +89,6 @@ export class GetPriceHistoryUseCase {
   async deletePriceRecord(id: string): Promise<boolean> {
     return this.priceRecordRepository.delete(id);
   }
-
 
   private mapToDto(record: PriceRecord): PriceRecordDto {
     return {

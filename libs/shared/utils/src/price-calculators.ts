@@ -1,21 +1,33 @@
 export class PriceCalculator {
-  static calculatePremiumPercent(assetPrice: number, spotPrice: number): number {
+  static calculatePremiumPercent(
+    assetPrice: number,
+    spotPrice: number
+  ): number {
     if (spotPrice === 0) return 0;
     return ((assetPrice - spotPrice) / spotPrice) * 100;
   }
 
-  static calculatePricePerGram(totalPrice: number, weightGrams: number): number {
+  static calculatePricePerGram(
+    totalPrice: number,
+    weightGrams: number
+  ): number {
     if (weightGrams === 0) return 0;
     return totalPrice / weightGrams;
   }
 
-  static calculatePricePerTroyOunce(totalPrice: number, weightGrams: number): number {
+  static calculatePricePerTroyOunce(
+    totalPrice: number,
+    weightGrams: number
+  ): number {
     if (weightGrams === 0) return 0;
     const troyOunces = weightGrams / 31.1034768;
     return totalPrice / troyOunces;
   }
 
-  static calculateSpotValueForWeight(spotPricePerOz: number, weightGrams: number): number {
+  static calculateSpotValueForWeight(
+    spotPricePerOz: number,
+    weightGrams: number
+  ): number {
     const troyOunces = weightGrams / 31.1034768;
     return spotPricePerOz * troyOunces;
   }

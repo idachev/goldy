@@ -9,7 +9,9 @@ export interface IAssetRepository {
     metalType?: MetalType;
     manufacturerName?: string;
   }): Promise<Asset[]>;
-  create(asset: Omit<Asset, 'id' | 'createdAt' | 'updatedAt' | 'listings'>): Promise<Asset>;
+  create(
+    asset: Omit<Asset, 'id' | 'createdAt' | 'updatedAt' | 'listings'>
+  ): Promise<Asset>;
   update(id: string, asset: Partial<Asset>): Promise<Asset | null>;
   delete(id: string): Promise<boolean>;
 }

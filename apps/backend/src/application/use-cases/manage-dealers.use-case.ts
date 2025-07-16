@@ -38,15 +38,18 @@ export class ManageDealersUseCase {
     return this.mapToDto(dealer);
   }
 
-  async updateDealer(id: string, updates: Partial<{
-    name: string;
-    websiteUrl: string;
-    scrapingConfig: {
-      selectors: Record<string, string>;
-      urlPatterns: Record<AssetType, string>;
-    };
-    isActive: boolean;
-  }>): Promise<DealerDto | null> {
+  async updateDealer(
+    id: string,
+    updates: Partial<{
+      name: string;
+      websiteUrl: string;
+      scrapingConfig: {
+        selectors: Record<string, string>;
+        urlPatterns: Record<AssetType, string>;
+      };
+      isActive: boolean;
+    }>
+  ): Promise<DealerDto | null> {
     const dealer = await this.dealerRepository.update(id, updates);
     return dealer ? this.mapToDto(dealer) : null;
   }

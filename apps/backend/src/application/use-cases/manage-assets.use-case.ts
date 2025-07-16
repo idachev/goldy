@@ -38,14 +38,17 @@ export class ManageAssetsUseCase {
     return this.mapToDto(asset);
   }
 
-  async updateAsset(id: string, updates: Partial<{
-    name: string;
-    manufacturerName: string;
-    assetType: AssetType;
-    metalType: MetalType;
-    weightGrams: number;
-    purity?: string;
-  }>): Promise<AssetDto | null> {
+  async updateAsset(
+    id: string,
+    updates: Partial<{
+      name: string;
+      manufacturerName: string;
+      assetType: AssetType;
+      metalType: MetalType;
+      weightGrams: number;
+      purity?: string;
+    }>
+  ): Promise<AssetDto | null> {
     const asset = await this.assetRepository.update(id, updates);
     return asset ? this.mapToDto(asset) : null;
   }

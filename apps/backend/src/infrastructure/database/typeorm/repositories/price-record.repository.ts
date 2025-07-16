@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, LessThan } from 'typeorm';
+import { Repository } from 'typeorm';
 import { PriceRecord } from '../../../../domain/entities/price-record.entity';
 import { IPriceRecordRepository } from '../../../../domain/repositories/price-record.repository.interface';
 
@@ -8,7 +8,7 @@ import { IPriceRecordRepository } from '../../../../domain/repositories/price-re
 export class PriceRecordRepository implements IPriceRecordRepository {
   constructor(
     @InjectRepository(PriceRecord)
-    private readonly repository: Repository<PriceRecord>,
+    private readonly repository: Repository<PriceRecord>
   ) {}
 
   async findAll(): Promise<PriceRecord[]> {
@@ -33,7 +33,9 @@ export class PriceRecordRepository implements IPriceRecordRepository {
     });
   }
 
-  async findLatestByAssetListingId(assetListingId: string): Promise<PriceRecord | null> {
+  async findLatestByAssetListingId(
+    assetListingId: string
+  ): Promise<PriceRecord | null> {
     return this.repository.findOne({
       where: { assetListing: { id: assetListingId } },
       relations: ['assetListing', 'assetListing.asset', 'assetListing.dealer'],
@@ -41,8 +43,12 @@ export class PriceRecordRepository implements IPriceRecordRepository {
     });
   }
 
-  async findByDateRange(startDate: Date, endDate: Date): Promise<PriceRecord[]> {
-    return this.repository.createQueryBuilder('price_record')
+  async findByDateRange(
+    startDate: Date,
+    endDate: Date
+  ): Promise<PriceRecord[]> {
+    return this.repository
+      .createQueryBuilder('price_record')
       .leftJoinAndSelect('price_record.assetListing', 'assetListing')
       .leftJoinAndSelect('assetListing.asset', 'asset')
       .leftJoinAndSelect('assetListing.dealer', 'dealer')
@@ -53,7 +59,8 @@ export class PriceRecordRepository implements IPriceRecordRepository {
   }
 
   async findLatestPrices(): Promise<PriceRecord[]> {
-    return this.repository.createQueryBuilder('price_record')
+    return this.repository
+      .createQueryBuilder('price_record')
       .leftJoinAndSelect('price_record.assetListing', 'assetListing')
       .leftJoinAndSelect('assetListing.asset', 'asset')
       .leftJoinAndSelect('assetListing.dealer', 'dealer')
@@ -63,7 +70,9 @@ export class PriceRecordRepository implements IPriceRecordRepository {
       .getMany();
   }
 
-  async create(priceRecord: Omit<PriceRecord, 'id' | 'scrapedAt'>): Promise<PriceRecord> {
+  async create(
+    priceRecord: Omit<PriceRecord, 'id' | 'scrapedAt'>
+  ): Promise<PriceRecord> {
     const newPriceRecord = this.repository.create({
       ...priceRecord,
       scrapedAt: new Date(),

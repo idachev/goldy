@@ -8,7 +8,7 @@ import { IAssetListingRepository } from '../../../../domain/repositories/asset-l
 export class AssetListingRepository implements IAssetListingRepository {
   constructor(
     @InjectRepository(AssetListing)
-    private readonly repository: Repository<AssetListing>,
+    private readonly repository: Repository<AssetListing>
   ) {}
 
   async findAll(): Promise<AssetListing[]> {
@@ -47,20 +47,28 @@ export class AssetListingRepository implements IAssetListingRepository {
 
   async findForScraping(): Promise<AssetListing[]> {
     return this.repository.find({
-      where: { 
+      where: {
         isActive: true,
-        dealer: { isActive: true }
+        dealer: { isActive: true },
       },
       relations: ['asset', 'dealer'],
     });
   }
 
-  async create(listing: Omit<AssetListing, 'id' | 'createdAt' | 'updatedAt' | 'priceRecords'>): Promise<AssetListing> {
+  async create(
+    listing: Omit<
+      AssetListing,
+      'id' | 'createdAt' | 'updatedAt' | 'priceRecords'
+    >
+  ): Promise<AssetListing> {
     const newListing = this.repository.create(listing);
     return this.repository.save(newListing);
   }
 
-  async update(id: string, listing: Partial<AssetListing>): Promise<AssetListing | null> {
+  async update(
+    id: string,
+    listing: Partial<AssetListing>
+  ): Promise<AssetListing | null> {
     await this.repository.update(id, listing);
     return this.findById(id);
   }

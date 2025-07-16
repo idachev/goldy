@@ -27,7 +27,10 @@ export class WeightConverter {
     return pounds * this.GRAMS_PER_POUND;
   }
 
-  static formatWeight(grams: number, unit: 'g' | 'oz' | 'kg' | 'lb' = 'g'): string {
+  static formatWeight(
+    grams: number,
+    unit: 'g' | 'oz' | 'kg' | 'lb' = 'g'
+  ): string {
     switch (unit) {
       case 'oz':
         return `${this.gramsToTroyOunces(grams).toFixed(3)} oz`;

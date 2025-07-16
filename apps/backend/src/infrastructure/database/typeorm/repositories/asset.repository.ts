@@ -9,7 +9,7 @@ import { AssetType, MetalType } from '@goldy/shared/types';
 export class AssetRepository implements IAssetRepository {
   constructor(
     @InjectRepository(Asset)
-    private readonly repository: Repository<Asset>,
+    private readonly repository: Repository<Asset>
   ) {}
 
   async findAll(): Promise<Asset[]> {
@@ -30,28 +30,35 @@ export class AssetRepository implements IAssetRepository {
     metalType?: MetalType;
     manufacturerName?: string;
   }): Promise<Asset[]> {
-    const query = this.repository.createQueryBuilder('asset')
+    const query = this.repository
+      .createQueryBuilder('asset')
       .leftJoinAndSelect('asset.listings', 'listings')
       .leftJoinAndSelect('listings.dealer', 'dealer');
 
     if (filters.assetType) {
-      query.andWhere('asset.assetType = :assetType', { assetType: filters.assetType });
+      query.andWhere('asset.assetType = :assetType', {
+        assetType: filters.assetType,
+      });
     }
 
     if (filters.metalType) {
-      query.andWhere('asset.metalType = :metalType', { metalType: filters.metalType });
+      query.andWhere('asset.metalType = :metalType', {
+        metalType: filters.metalType,
+      });
     }
 
     if (filters.manufacturerName) {
-      query.andWhere('asset.manufacturerName LIKE :manufacturerName', { 
-        manufacturerName: `%${filters.manufacturerName}%` 
+      query.andWhere('asset.manufacturerName LIKE :manufacturerName', {
+        manufacturerName: `%${filters.manufacturerName}%`,
       });
     }
 
     return query.getMany();
   }
 
-  async create(asset: Omit<Asset, 'id' | 'createdAt' | 'updatedAt' | 'listings'>): Promise<Asset> {
+  async create(
+    asset: Omit<Asset, 'id' | 'createdAt' | 'updatedAt' | 'listings'>
+  ): Promise<Asset> {
     const newAsset = this.repository.create(asset);
     return this.repository.save(newAsset);
   }

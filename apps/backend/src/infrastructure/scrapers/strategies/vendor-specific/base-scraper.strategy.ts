@@ -1,7 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as puppeteer from 'puppeteer';
 import * as cheerio from 'cheerio';
-import { IScraperStrategy, ScrapedPriceData } from '../scraper.strategy.interface';
+import {
+  IScraperStrategy,
+  ScrapedPriceData,
+} from '../scraper.strategy.interface';
 import { AssetListing } from '../../../../domain/entities/asset-listing.entity';
 
 @Injectable()
@@ -9,11 +12,16 @@ export abstract class BaseScraperStrategy implements IScraperStrategy {
   protected readonly logger = new Logger(this.constructor.name);
 
   abstract canHandle(dealerName: string): boolean;
-  abstract scrapePrice(assetListing: AssetListing): Promise<ScrapedPriceData | null>;
+  abstract scrapePrice(
+    assetListing: AssetListing
+  ): Promise<ScrapedPriceData | null>;
 
-  protected async fetchPageContent(url: string, waitForSelector?: string): Promise<string | null> {
+  protected async fetchPageContent(
+    url: string,
+    waitForSelector?: string
+  ): Promise<string | null> {
     let browser: puppeteer.Browser | null = null;
-    
+
     try {
       browser = await puppeteer.launch({
         headless: true,
@@ -21,7 +29,7 @@ export abstract class BaseScraperStrategy implements IScraperStrategy {
       });
 
       const page = await browser.newPage();
-      
+
       await page.setUserAgent(
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
       );
@@ -56,9 +64,11 @@ export abstract class BaseScraperStrategy implements IScraperStrategy {
 
   protected extractInStock(text: string): boolean {
     const lowerText = text.toLowerCase();
-    return !lowerText.includes('out of stock') && 
-           !lowerText.includes('unavailable') &&
-           !lowerText.includes('sold out');
+    return (
+      !lowerText.includes('out of stock') &&
+      !lowerText.includes('unavailable') &&
+      !lowerText.includes('sold out')
+    );
   }
 
   protected extractDeliveryDays(text: string): number | undefined {
@@ -67,6 +77,6 @@ export abstract class BaseScraperStrategy implements IScraperStrategy {
   }
 
   protected async delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }

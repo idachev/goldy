@@ -8,7 +8,7 @@ import { IDealerRepository } from '../../../../domain/repositories/dealer.reposi
 export class DealerRepository implements IDealerRepository {
   constructor(
     @InjectRepository(Dealer)
-    private readonly repository: Repository<Dealer>,
+    private readonly repository: Repository<Dealer>
   ) {}
 
   async findAll(): Promise<Dealer[]> {
@@ -38,7 +38,9 @@ export class DealerRepository implements IDealerRepository {
     });
   }
 
-  async create(dealer: Omit<Dealer, 'id' | 'createdAt' | 'listings'>): Promise<Dealer> {
+  async create(
+    dealer: Omit<Dealer, 'id' | 'createdAt' | 'listings'>
+  ): Promise<Dealer> {
     const newDealer = this.repository.create(dealer);
     return this.repository.save(newDealer);
   }

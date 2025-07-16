@@ -1,6 +1,9 @@
 import { describe, test, expect, beforeEach } from '@jest/globals';
 import { ErrorDto, ErrorDtoBuilder } from './error.dto';
-import { GeneralErrorCode, GeneralErrorCodeImpl } from '../errors/general-error-code.enum';
+import {
+  GeneralErrorCode,
+  GeneralErrorCodeImpl,
+} from '../errors/general-error-code.enum';
 import { BusinessRuleError } from '../errors/business-rule-error';
 
 describe('ErrorDto', () => {
@@ -24,8 +27,12 @@ describe('ErrorDto', () => {
       const result = ErrorDtoBuilder.create().build();
       const afterTime = new Date();
 
-      expect(result.timestamp.getTime()).toBeGreaterThanOrEqual(beforeTime.getTime());
-      expect(result.timestamp.getTime()).toBeLessThanOrEqual(afterTime.getTime());
+      expect(result.timestamp.getTime()).toBeGreaterThanOrEqual(
+        beforeTime.getTime()
+      );
+      expect(result.timestamp.getTime()).toBeLessThanOrEqual(
+        afterTime.getTime()
+      );
       expect(result.httpStatus).toBe(500);
       expect(result.errorCode).toBe(5009999);
       expect(result.errorId).toBe('INTERNAL_SERVER_ERROR_GENERAL');
@@ -39,8 +46,12 @@ describe('ErrorDto', () => {
       ).build();
       const afterTime = new Date();
 
-      expect(result.timestamp.getTime()).toBeGreaterThanOrEqual(beforeTime.getTime());
-      expect(result.timestamp.getTime()).toBeLessThanOrEqual(afterTime.getTime());
+      expect(result.timestamp.getTime()).toBeGreaterThanOrEqual(
+        beforeTime.getTime()
+      );
+      expect(result.timestamp.getTime()).toBeLessThanOrEqual(
+        afterTime.getTime()
+      );
       expect(result.httpStatus).toBe(404);
       expect(result.errorCode).toBe(4049999);
       expect(result.errorId).toBe('NOT_FOUND_GENERAL');
@@ -56,8 +67,12 @@ describe('ErrorDto', () => {
         .build();
       const afterTime = new Date();
 
-      expect(result.timestamp.getTime()).toBeGreaterThanOrEqual(beforeTime.getTime());
-      expect(result.timestamp.getTime()).toBeLessThanOrEqual(afterTime.getTime());
+      expect(result.timestamp.getTime()).toBeGreaterThanOrEqual(
+        beforeTime.getTime()
+      );
+      expect(result.timestamp.getTime()).toBeLessThanOrEqual(
+        afterTime.getTime()
+      );
       expect(result.httpStatus).toBe(502);
       expect(result.errorCode).toBe(5029999);
       expect(result.errorId).toBe('BAD_GATEWAY_GENERAL');
@@ -94,7 +109,7 @@ describe('ErrorDto', () => {
       // Convert timestamp back to Date object
       const reconstructed: ErrorDto = {
         ...parsed,
-        timestamp: new Date(parsed.timestamp)
+        timestamp: new Date(parsed.timestamp),
       };
 
       expect(reconstructed.timestamp).toEqual(TEST_DATE_20220905_081555_789);
@@ -112,13 +127,17 @@ describe('ErrorDto', () => {
       builder.timestamp = null;
       builder.errorCode = null;
 
-      expect(() => builder.build()).toThrow('timestamp and errorCode are required');
+      expect(() => builder.build()).toThrow(
+        'timestamp and errorCode are required'
+      );
     });
 
     test('should allow method chaining', () => {
       const result = ErrorDtoBuilder.create()
         .withTimestamp(TEST_DATE_20220905_081555_789)
-        .withErrorCode(GeneralErrorCodeImpl.from(GeneralErrorCode.BAD_REQUEST_GENERAL))
+        .withErrorCode(
+          GeneralErrorCodeImpl.from(GeneralErrorCode.BAD_REQUEST_GENERAL)
+        )
         .withErrorDetails(['test detail'])
         .build();
 
@@ -131,10 +150,19 @@ describe('ErrorDto', () => {
   describe('error code mapping', () => {
     test('should map error codes to correct HTTP status', () => {
       const testCases = [
-        { errorCode: GeneralErrorCode.BAD_REQUEST_GENERAL, expectedStatus: 400 },
+        {
+          errorCode: GeneralErrorCode.BAD_REQUEST_GENERAL,
+          expectedStatus: 400,
+        },
         { errorCode: GeneralErrorCode.NOT_FOUND_GENERAL, expectedStatus: 404 },
-        { errorCode: GeneralErrorCode.BAD_GATEWAY_GENERAL, expectedStatus: 502 },
-        { errorCode: GeneralErrorCode.INTERNAL_SERVER_ERROR_GENERAL, expectedStatus: 500 },
+        {
+          errorCode: GeneralErrorCode.BAD_GATEWAY_GENERAL,
+          expectedStatus: 502,
+        },
+        {
+          errorCode: GeneralErrorCode.INTERNAL_SERVER_ERROR_GENERAL,
+          expectedStatus: 500,
+        },
       ];
 
       testCases.forEach(({ errorCode, expectedStatus }) => {

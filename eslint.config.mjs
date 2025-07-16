@@ -14,7 +14,7 @@ export default [
       '**/*.spec.ts',
       '**/*.test.ts',
       '**/*.d.ts',
-      'jest.config.*',
+      '**/jest.config.*',
       'webpack.config.js',
       'next.config.js',
       '*.mjs',

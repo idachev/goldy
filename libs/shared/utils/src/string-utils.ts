@@ -18,11 +18,13 @@ export class StringUtils {
       return value;
     }
 
-    return value.substring(0, showChars) +
-           '...' +
-           value.length +
-           '...' +
-           value.substring(value.length - showChars);
+    return (
+      value.substring(0, showChars) +
+      '...' +
+      value.length +
+      '...' +
+      value.substring(value.length - showChars)
+    );
   }
 
   /**
@@ -44,7 +46,8 @@ export class StringUtils {
 
     try {
       // Basic UUID validation
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      const uuidRegex =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
       return uuidRegex.test(value) ? value : null;
     } catch {
       return null;
@@ -60,8 +63,8 @@ export class StringUtils {
     }
 
     return uuidStrings
-      .map(str => this.toUuid(str))
-      .filter(uuid => uuid !== null) as string[];
+      .map((str) => this.toUuid(str))
+      .filter((uuid) => uuid !== null) as string[];
   }
 
   /**
@@ -85,7 +88,11 @@ export class StringUtils {
   /**
    * Format email with full name
    */
-  public static toEmail(email: string, firstName?: string, lastName?: string): string {
+  public static toEmail(
+    email: string,
+    firstName?: string,
+    lastName?: string
+  ): string {
     const fullName = this.toFullName(firstName, lastName);
     return fullName ? `${fullName} <${email}>` : email;
   }
@@ -99,7 +106,9 @@ export class StringUtils {
     }
 
     // Remove non-printable characters and replacement character
-    return text.replace(/[^\p{L}\p{M}\p{N}\p{P}\p{Z}\s]/gu, '').replace(/�/g, '');
+    return text
+      .replace(/[^\p{L}\p{M}\p{N}\p{P}\p{Z}\s]/gu, '')
+      .replace(/�/g, '');
   }
 
   /**
@@ -110,11 +119,11 @@ export class StringUtils {
       return [];
     }
 
-    return [...new Set(
-      strings
-        .map(s => this.trimToEmpty(s))
-        .filter(s => s.length > 0)
-    )];
+    return [
+      ...new Set(
+        strings.map((s) => this.trimToEmpty(s)).filter((s) => s.length > 0)
+      ),
+    ];
   }
 
   /**
@@ -136,8 +145,8 @@ export class StringUtils {
    */
   public static concatNotEmpty(...strings: string[]): string {
     return strings
-      .map(s => this.trimToEmpty(s))
-      .filter(s => s.length > 0)
+      .map((s) => this.trimToEmpty(s))
+      .filter((s) => s.length > 0)
       .join(' ');
   }
 

@@ -1,5 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ErrorCode } from './error-code.interface';
-import { GeneralErrorCode, GeneralErrorCodeImpl } from './general-error-code.enum';
+import {
+  GeneralErrorCode,
+  GeneralErrorCodeImpl,
+} from './general-error-code.enum';
 import { BusinessRuleError } from './business-rule-error';
 import { ErrorDto, ErrorDtoBuilder } from '../dto/error.dto';
 import { IDUtils, StringUtils } from '@goldy/shared/utils';
@@ -40,14 +44,17 @@ export class ErrorUtils {
     throw new Error('Utility class');
   }
 
-  public static findError<T extends Error>(error: Error, errorClass: new (...args: any[]) => T): T | null {
+  public static findError<T extends Error>(
+    error: Error,
+    errorClass: new (...args: any[]) => T
+  ): T | null {
     let current: Error | null = error;
 
     while (current) {
       if (current instanceof errorClass) {
         return current as T;
       }
-      current = current.cause as Error || null;
+      current = (current.cause as Error) || null;
     }
 
     return null;
@@ -58,7 +65,10 @@ export class ErrorUtils {
     return this.getErrorInfo(error, false).classNames;
   }
 
-  public static getErrorMessages(error: Error | null, addClassNameToMessage: boolean = true): string[] {
+  public static getErrorMessages(
+    error: Error | null,
+    addClassNameToMessage: boolean = true
+  ): string[] {
     if (!error) return [];
     return this.getErrorInfo(error, addClassNameToMessage).messages;
   }
@@ -68,13 +78,18 @@ export class ErrorUtils {
     return message || error.constructor.name;
   }
 
-  public static registerErrorMessageExtractors(extractors: ErrorMessageExtractor<any>[]): void {
-    extractors.forEach(extractor => {
+  public static registerErrorMessageExtractors(
+    extractors: ErrorMessageExtractor<any>[]
+  ): void {
+    extractors.forEach((extractor) => {
       this.registerErrorMessageExtractor(extractor);
     });
   }
 
-  public static getErrorInfo(error: Error, addClassNameToMessage: boolean): ErrorInfo {
+  public static getErrorInfo(
+    error: Error,
+    addClassNameToMessage: boolean
+  ): ErrorInfo {
     const errors = this.getErrorChain(error);
 
     const classNames: string[] = [];
@@ -82,7 +97,9 @@ export class ErrorUtils {
     const errorCodes: ErrorCode[] = [];
 
     errors.forEach((err, index) => {
-      const extractor = this.resolveExtractorForClass(err.constructor as new (...args: any[]) => Error);
+      const extractor = this.resolveExtractorForClass(
+        err.constructor as new (...args: any[]) => Error
+      );
 
       let message = '';
 
@@ -102,20 +119,14 @@ export class ErrorUtils {
       if (addClassNameToMessage) {
         if (message) {
           messages.push(`${className}(${message})`);
-
         } else if (index < errors.length - 1) {
-
           const nextError = errors[index + 1];
 
           messages.push(`${className}(${nextError.constructor.name})`);
-
         } else {
-
           messages.push(className);
         }
-
       } else {
-
         if (message) {
           messages.push(message);
         } else {
@@ -134,7 +145,10 @@ export class ErrorUtils {
 
     if (!extractor) {
       // Check for inheritance
-      for (const [registeredClass, registeredExtractor] of this.classToErrorMessageExtractor.entries()) {
+      for (const [
+        registeredClass,
+        registeredExtractor,
+      ] of this.classToErrorMessageExtractor.entries()) {
         if (errorClass.prototype instanceof registeredClass) {
           extractor = registeredExtractor;
           break;
@@ -151,7 +165,11 @@ export class ErrorUtils {
     this.classToErrorMessageExtractor.set(extractor.getErrorClass(), extractor);
   }
 
-  public static isValidArgument(condition: boolean, message: string, ...args: any[]): void {
+  public static isValidArgument(
+    condition: boolean,
+    message: string,
+    ...args: any[]
+  ): void {
     this.isValid(
       condition,
       GeneralErrorCodeImpl.from(GeneralErrorCode.BAD_REQUEST_GENERAL),
@@ -160,7 +178,11 @@ export class ErrorUtils {
     );
   }
 
-  public static isFoundResource(condition: boolean, message: string, ...args: any[]): void {
+  public static isFoundResource(
+    condition: boolean,
+    message: string,
+    ...args: any[]
+  ): void {
     this.isValid(
       condition,
       GeneralErrorCodeImpl.from(GeneralErrorCode.NOT_FOUND_GENERAL),
@@ -169,7 +191,11 @@ export class ErrorUtils {
     );
   }
 
-  public static isAllowed(condition: boolean, message: string, ...args: any[]): void {
+  public static isAllowed(
+    condition: boolean,
+    message: string,
+    ...args: any[]
+  ): void {
     this.isValid(
       condition,
       GeneralErrorCodeImpl.from(GeneralErrorCode.FORBIDDEN_GENERAL),
@@ -178,7 +204,11 @@ export class ErrorUtils {
     );
   }
 
-  public static isConflict(condition: boolean, message: string, ...args: any[]): void {
+  public static isConflict(
+    condition: boolean,
+    message: string,
+    ...args: any[]
+  ): void {
     this.isValid(
       condition,
       GeneralErrorCodeImpl.from(GeneralErrorCode.CONFLICT_GENERAL),
@@ -195,19 +225,28 @@ export class ErrorUtils {
    * - %f: float (use %.2f for 2 decimal places)
    * - %j: JSON
    * - %o: object inspection
-   * 
+   *
    * @example
    * ErrorUtils.isValid(false, errorCode, 'User %s has %d items', 'John', 5);
    * // Throws: User John has 5 items
    */
-  private static isValid(condition: boolean, errorCode: ErrorCode, message: string, ...args: any[]): void {
+  private static isValid(
+    condition: boolean,
+    errorCode: ErrorCode,
+    message: string,
+    ...args: any[]
+  ): void {
     if (!condition) {
       const formattedMessage = sprintf(message, ...args);
       throw new BusinessRuleError(errorCode, formattedMessage);
     }
   }
 
-  public static trimAndValidateId(idValue: string, idName: string, maxIdSize: number = this.DEFAULT_MAX_ID_SIZE): string {
+  public static trimAndValidateId(
+    idValue: string,
+    idName: string,
+    maxIdSize: number = this.DEFAULT_MAX_ID_SIZE
+  ): string {
     const trimmedIdName = StringUtils.trimToEmpty(idName);
     const trimmedIdValue = StringUtils.trimToEmpty(idValue);
 
@@ -219,23 +258,41 @@ export class ErrorUtils {
       throw new Error(`Expected maxIdSize to be positive: ${maxIdSize}`);
     }
 
-    this.isValidArgument(!!trimmedIdValue, `Expected not empty ${trimmedIdName}`);
+    this.isValidArgument(
+      !!trimmedIdValue,
+      `Expected not empty ${trimmedIdName}`
+    );
     this.isValidArgument(
       IDUtils.isValidId(trimmedIdValue, maxIdSize),
-      `Invalid ${trimmedIdName}: ${StringUtils.hideString(trimmedIdValue, Math.floor(maxIdSize / 2))}`
+      `Invalid ${trimmedIdName}: ${StringUtils.hideString(
+        trimmedIdValue,
+        Math.floor(maxIdSize / 2)
+      )}`
     );
 
     return trimmedIdValue;
   }
 
-  public static toBusinessRuleError(httpStatusOrDto: number | ErrorDto | null, errorResponseOrMessage?: string): BusinessRuleError {
+  public static toBusinessRuleError(
+    httpStatusOrDto: number | ErrorDto | null,
+    errorResponseOrMessage?: string
+  ): BusinessRuleError {
     if (typeof httpStatusOrDto === 'number') {
-      return this.toBusinessRuleErrorFromStatus(httpStatusOrDto, errorResponseOrMessage);
+      return this.toBusinessRuleErrorFromStatus(
+        httpStatusOrDto,
+        errorResponseOrMessage
+      );
     }
-    return this.toBusinessRuleErrorFromDto(httpStatusOrDto, errorResponseOrMessage);
+    return this.toBusinessRuleErrorFromDto(
+      httpStatusOrDto,
+      errorResponseOrMessage
+    );
   }
 
-  public static toBusinessRuleErrorFromStatus(httpStatus: number, errorResponse?: string): BusinessRuleError {
+  public static toBusinessRuleErrorFromStatus(
+    httpStatus: number,
+    errorResponse?: string
+  ): BusinessRuleError {
     const trimmedResponse = StringUtils.trimToEmpty(errorResponse);
 
     let errorData: any = null;
@@ -247,26 +304,36 @@ export class ErrorUtils {
 
     let errorDto: ErrorDto | null = null;
 
-    if (errorData && typeof errorData === 'object' &&
-        'errorCode' in errorData && 'httpStatus' in errorData) {
+    if (
+      errorData &&
+      typeof errorData === 'object' &&
+      'errorCode' in errorData &&
+      'httpStatus' in errorData
+    ) {
       errorDto = errorData as ErrorDto;
     }
 
     if (!errorDto && errorData && typeof errorData === 'object') {
-      const errorCode = GeneralErrorCodeImpl.errorCodeFromHttpStatus(httpStatus);
+      const errorCode =
+        GeneralErrorCodeImpl.errorCodeFromHttpStatus(httpStatus);
 
-      if (Object.keys(errorData).length === 1 &&
-          (this.JSON_RESPONSE_MESSAGE_KEY in errorData || this.JSON_RESPONSE_ERROR_KEY in errorData)) {
-        const errorMsg = errorData[this.JSON_RESPONSE_MESSAGE_KEY] || errorData[this.JSON_RESPONSE_ERROR_KEY];
+      if (
+        Object.keys(errorData).length === 1 &&
+        (this.JSON_RESPONSE_MESSAGE_KEY in errorData ||
+          this.JSON_RESPONSE_ERROR_KEY in errorData)
+      ) {
+        const errorMsg =
+          errorData[this.JSON_RESPONSE_MESSAGE_KEY] ||
+          errorData[this.JSON_RESPONSE_ERROR_KEY];
 
         errorDto = ErrorDtoBuilder.create(errorCode)
           .withErrorDetails([String(errorMsg)])
           .build();
-
-      } else if (Object.keys(errorData).length === 2 &&
-                 this.JSON_RESPONSE_MESSAGE_KEY in errorData &&
-                 this.JSON_RESPONSE_ERROR_KEY in errorData) {
-
+      } else if (
+        Object.keys(errorData).length === 2 &&
+        this.JSON_RESPONSE_MESSAGE_KEY in errorData &&
+        this.JSON_RESPONSE_ERROR_KEY in errorData
+      ) {
         const message = String(errorData[this.JSON_RESPONSE_MESSAGE_KEY]);
         const error = String(errorData[this.JSON_RESPONSE_ERROR_KEY]);
 
@@ -277,7 +344,8 @@ export class ErrorUtils {
     }
 
     if (!errorDto) {
-      const defaultErrorCode = GeneralErrorCodeImpl.errorCodeFromHttpStatus(httpStatus);
+      const defaultErrorCode =
+        GeneralErrorCodeImpl.errorCodeFromHttpStatus(httpStatus);
 
       errorDto = ErrorDtoBuilder.create(defaultErrorCode)
         .withErrorDetails([trimmedResponse || 'Unknown error'])
@@ -287,19 +355,27 @@ export class ErrorUtils {
     return this.toBusinessRuleErrorFromDto(errorDto);
   }
 
-  public static toBusinessRuleErrorFromDto(errorDto: ErrorDto, errorMessage?: string): BusinessRuleError {
+  public static toBusinessRuleErrorFromDto(
+    errorDto: ErrorDto,
+    errorMessage?: string
+  ): BusinessRuleError {
     if (!errorDto) {
       return new BusinessRuleError(
-        GeneralErrorCodeImpl.from(GeneralErrorCode.INTERNAL_SERVER_ERROR_GENERAL),
+        GeneralErrorCodeImpl.from(
+          GeneralErrorCode.INTERNAL_SERVER_ERROR_GENERAL
+        ),
         errorMessage || 'Unknown error'
       );
     }
 
     let errorCode: ErrorCode;
     if (errorDto.errorCode === 0) {
-      errorCode = errorDto.httpStatus !== 0
-        ? GeneralErrorCodeImpl.errorCodeFromHttpStatus(errorDto.httpStatus)
-        : GeneralErrorCodeImpl.from(GeneralErrorCode.INTERNAL_SERVER_ERROR_GENERAL);
+      errorCode =
+        errorDto.httpStatus !== 0
+          ? GeneralErrorCodeImpl.errorCodeFromHttpStatus(errorDto.httpStatus)
+          : GeneralErrorCodeImpl.from(
+              GeneralErrorCode.INTERNAL_SERVER_ERROR_GENERAL
+            );
     } else {
       errorCode = GeneralErrorCodeImpl.from(errorDto.errorCode, false);
     }
@@ -325,10 +401,9 @@ export class ErrorUtils {
     while (current && !visited.has(current)) {
       chain.push(current);
       visited.add(current);
-      current = current.cause as Error || null;
+      current = (current.cause as Error) || null;
     }
 
     return chain;
   }
-
 }

@@ -10,7 +10,7 @@ export class ManageAssetListingsUseCase {
   constructor(
     private readonly assetListingRepository: AssetListingRepository,
     private readonly assetRepository: AssetRepository,
-    private readonly dealerRepository: DealerRepository,
+    private readonly dealerRepository: DealerRepository
   ) {}
 
   async getAllListings(): Promise<AssetListingDto[]> {
@@ -61,10 +61,13 @@ export class ManageAssetListingsUseCase {
     return this.mapToDto(listing);
   }
 
-  async updateListing(id: string, updates: Partial<{
-    productLink: string;
-    isActive: boolean;
-  }>): Promise<AssetListingDto | null> {
+  async updateListing(
+    id: string,
+    updates: Partial<{
+      productLink: string;
+      isActive: boolean;
+    }>
+  ): Promise<AssetListingDto | null> {
     const listing = await this.assetListingRepository.update(id, updates);
     return listing ? this.mapToDto(listing) : null;
   }

@@ -6,14 +6,12 @@ export class BusinessRuleError extends Error {
   public readonly originalMessage: string;
   public readonly timestamp: Date;
 
-  constructor(
-    errorCode: ErrorCode,
-    message: string,
-    ...args: any[]
-  ) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  constructor(errorCode: ErrorCode, message: string, ...args: any[]) {
     // Format the message using sprintf if there are format arguments
-    const formattedOriginalMessage = args.length > 0 ? sprintf(message, ...args) : message;
-    
+    const formattedOriginalMessage =
+      args.length > 0 ? sprintf(message, ...args) : message;
+
     const formattedMessage = formattedOriginalMessage
       ? `[${errorCode.errorId()}] ${formattedOriginalMessage}`
       : `[${errorCode.errorId()}]`;

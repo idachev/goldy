@@ -27,13 +27,15 @@ describe('StringUtils', () => {
 
   describe('truncateValue', () => {
     it('should truncate long values', () => {
-      const longValue = 'LongLongValue1 LongLongValue2 LongLongValue3 ' +
-                       'LongLongValue4 LongLongValue5 LongLongValue6 ' +
-                       'LongLongValue7 LongLongValue8 LongLongValue9';
-      
-      const expected = 'LongLongValue1 LongLongValue2 LongLongValue3 LongLongValue4 ' +
-                      'LongLongValue5 LongLongValue6 LongLongValue7 LongLongValue8 LongLong...';
-      
+      const longValue =
+        'LongLongValue1 LongLongValue2 LongLongValue3 ' +
+        'LongLongValue4 LongLongValue5 LongLongValue6 ' +
+        'LongLongValue7 LongLongValue8 LongLongValue9';
+
+      const expected =
+        'LongLongValue1 LongLongValue2 LongLongValue3 LongLongValue4 ' +
+        'LongLongValue5 LongLongValue6 LongLongValue7 LongLongValue8 LongLong...';
+
       expect(StringUtils.truncateValue(longValue)).toBe(expected);
     });
 
@@ -95,26 +97,37 @@ describe('StringUtils', () => {
 
     it('should combine first and last names', () => {
       expect(StringUtils.toFullName('first', 'last')).toBe('first last');
-      expect(StringUtils.toFullName(' first ', ' \t last\n\r')).toBe('first last');
+      expect(StringUtils.toFullName(' first ', ' \t last\n\r')).toBe(
+        'first last'
+      );
     });
   });
 
   describe('toEmail', () => {
     it('should handle email without names', () => {
       expect(StringUtils.toEmail('test@email.com')).toBe('test@email.com');
-      expect(StringUtils.toEmail('test@email.com', ' \t', '\r\n\t')).toBe('test@email.com');
+      expect(StringUtils.toEmail('test@email.com', ' \t', '\r\n\t')).toBe(
+        'test@email.com'
+      );
     });
 
     it('should format email with names', () => {
-      expect(StringUtils.toEmail('test@email.com', 'ivan\r\t', null)).toBe('ivan <test@email.com>');
-      expect(StringUtils.toEmail('test@email.com', 'ivan\r\t', 'last')).toBe('ivan last <test@email.com>');
+      expect(StringUtils.toEmail('test@email.com', 'ivan\r\t', null)).toBe(
+        'ivan <test@email.com>'
+      );
+      expect(StringUtils.toEmail('test@email.com', 'ivan\r\t', 'last')).toBe(
+        'ivan last <test@email.com>'
+      );
     });
   });
 
   describe('removeNonPrintableCharacters', () => {
     it('should remove non-printable characters', () => {
-      expect(StringUtils.removeNonPrintableCharacters('雙賣uD835\uDE49০Ρļ\uDC7A\uDC7A\uD83D\uDD25'))
-        .toBe('雙賣uD835০Ρļ');
+      expect(
+        StringUtils.removeNonPrintableCharacters(
+          '雙賣uD835\uDE49০Ρļ\uDC7A\uDC7A\uD83D\uDD25'
+        )
+      ).toBe('雙賣uD835০Ρļ');
     });
 
     it('should handle null and empty strings', () => {
@@ -144,8 +157,12 @@ describe('StringUtils', () => {
 
   describe('toSimplePathName', () => {
     it('should convert to simple path name', () => {
-      expect(StringUtils.toSimplePathName('\r\nTest \\// tesy 1\t\r\n')).toBe('Test_tesy_1');
-      expect(StringUtils.toSimplePathName('\r\nTest \\// tesy 1\t\r\n__test+()090')).toBe('Test_tesy_1_test_090');
+      expect(StringUtils.toSimplePathName('\r\nTest \\// tesy 1\t\r\n')).toBe(
+        'Test_tesy_1'
+      );
+      expect(
+        StringUtils.toSimplePathName('\r\nTest \\// tesy 1\t\r\n__test+()090')
+      ).toBe('Test_tesy_1_test_090');
       expect(StringUtils.toSimplePathName('///Test///')).toBe('Test');
     });
 
@@ -165,7 +182,9 @@ describe('StringUtils', () => {
 
     it('should concatenate non-empty strings', () => {
       expect(StringUtils.concatNotEmpty('  \r\t', '\r\t t', '')).toBe('t');
-      expect(StringUtils.concatNotEmpty('a\r\n\t', null as any, 'leon')).toBe('a leon');
+      expect(StringUtils.concatNotEmpty('a\r\n\t', null as any, 'leon')).toBe(
+        'a leon'
+      );
       expect(StringUtils.concatNotEmpty('\r\t\na  ', ' b ')).toBe('a b');
     });
   });

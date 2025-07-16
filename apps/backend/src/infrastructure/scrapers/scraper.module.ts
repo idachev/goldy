@@ -7,25 +7,19 @@ import { GetPriceHistoryUseCase } from '../../application/use-cases/get-price-hi
 import { ApmexScraperStrategy } from './strategies/vendor-specific/apmex-scraper.strategy';
 
 @Module({
-  imports: [
-    ScheduleModule.forRoot(),
-    DatabaseModule,
-  ],
+  imports: [ScheduleModule.forRoot(), DatabaseModule],
   providers: [
     ScraperService,
     AssetScrapingSchedulerService,
     GetPriceHistoryUseCase,
     ApmexScraperStrategy,
   ],
-  exports: [
-    ScraperService,
-    AssetScrapingSchedulerService,
-  ],
+  exports: [ScraperService, AssetScrapingSchedulerService],
 })
 export class ScraperModule {
   constructor(
     private readonly scraperService: ScraperService,
-    private readonly apmexStrategy: ApmexScraperStrategy,
+    private readonly apmexStrategy: ApmexScraperStrategy
   ) {
     // Register scraper strategies
     this.scraperService.registerStrategy(this.apmexStrategy);
