@@ -14,10 +14,28 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Code Quality
 
-- `npm run lint` - Run ESLint to check code quality and style
+- `npm run lint` - Run ESLint to check code quality and style (includes SonarJS rules)
 - `npm run lint:fix` - Run ESLint with auto-fix for fixable issues
 - `npm run format` - Format code with Prettier
 - `npm run format:check` - Check code formatting without making changes
+
+#### SonarJS Integration
+
+The project uses `eslint-plugin-sonarjs` which provides SonarQube-like static analysis rules including:
+
+- Code complexity analysis
+- Bug detection patterns
+- Security vulnerability checks
+- Code smell identification
+- Performance anti-patterns
+
+Common SonarJS warnings:
+
+- `sonarjs/todo-tag` - Reminds to complete TODO comments
+- `sonarjs/no-commented-code` - Detects commented-out code
+- `sonarjs/prefer-regexp-exec` - Suggests more efficient regex usage
+- `sonarjs/slow-regex` - Warns about regex vulnerable to ReDoS attacks
+- `sonarjs/deprecation` - Flags deprecated API usage
 
 ### Testing
 

@@ -1,12 +1,12 @@
 # Review TODOs
 
-- [ ] Fix in all use cases to throw BusinessRuleError when validation fails for required fields
 - [ ] Check how to add sonar qube static analysis to the project
 - [ ] Add GitHub actions to run tests on each PR and push to main branch
 - [ ] Fix the README.md to be by the project - move only related nx commands to a separate NX Build section in the readme
 
 # DONE
 
+- [x] Fix in all use cases to throw BusinessRuleError when validation fails for required fields
 - [x] Add on each git commit to do prettier and eslint checks
 - [x] check and use sprintf-js lib instead of formatMessage in error-utils.ts
 - [x] Implement error handling add custom exception for business use cases called BusinessRuleError, It should have these fields:

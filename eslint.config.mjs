@@ -2,6 +2,7 @@ import js from '@eslint/js';
 import tsPlugin from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 import prettierConfig from 'eslint-config-prettier';
+import sonarjs from 'eslint-plugin-sonarjs';
 
 export default [
   {
@@ -24,6 +25,7 @@ export default [
   },
   js.configs.recommended,
   prettierConfig,
+  sonarjs.configs.recommended,
   {
     files: ['**/*.ts', '**/*.tsx'],
     languageOptions: {
