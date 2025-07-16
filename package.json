@@ -62,6 +62,9 @@
     ],
     "*.{js,jsx,json,md}": [
       "prettier --write"
+    ],
+    "package.json": [
+      "npx nx sync:check"
     ]
   },
   "dependencies": {
