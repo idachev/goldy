@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { AssetDto, AssetType, MetalType } from '@goldy/shared/types';
-import { ErrorUtils } from '@goldy/shared/types';
-import { IDUtils } from '@goldy/shared/utils';
+import { ErrorUtils, IDUtils } from '@goldy/shared/utils';
 import { AssetRepository } from '../../infrastructure/database/typeorm/repositories/asset.repository';
 import { Asset } from '../../domain/entities/asset.entity';
 

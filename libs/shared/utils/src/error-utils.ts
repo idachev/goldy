@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ErrorCode } from './error-code.interface';
+import { ErrorCode } from '../../types/src/errors/error-code.interface';
 import {
   GeneralErrorCode,
   GeneralErrorCodeImpl,
-} from './general-error-code.enum';
-import { BusinessRuleError } from './business-rule-error';
-import { ErrorDto, ErrorDtoBuilder } from '../dto/error.dto';
-import { IDUtils, StringUtils } from '@goldy/shared/utils';
+} from '../../types/src/errors/general-error-code.enum';
+import { BusinessRuleError } from '../../types/src/errors/business-rule-error';
+import { ErrorDto, ErrorDtoBuilder } from '../../types/src/dto/error.dto';
+import { IDUtils } from './id-utils';
+import { StringUtils } from './string-utils';
 import { sprintf } from 'sprintf-js';
 
 export interface ErrorMessageExtractor<T extends Error> {
@@ -281,6 +282,14 @@ export class ErrorUtils {
       return this.toBusinessRuleErrorFromStatus(
         httpStatusOrDto,
         errorResponseOrMessage
+      );
+    }
+    if (!httpStatusOrDto) {
+      return new BusinessRuleError(
+        GeneralErrorCodeImpl.from(
+          GeneralErrorCode.INTERNAL_SERVER_ERROR_GENERAL
+        ),
+        errorResponseOrMessage || 'Unknown error'
       );
     }
     return this.toBusinessRuleErrorFromDto(

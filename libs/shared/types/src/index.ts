@@ -8,4 +8,3 @@ export * from './dto/error.dto.js';
 export * from './errors/error-code.interface.js';
 export * from './errors/general-error-code.enum.js';
 export * from './errors/business-rule-error.js';
-export * from './errors/error-utils.js';

@@ -1,12 +1,12 @@
 import { describe, test, expect, beforeEach } from '@jest/globals';
 import { ErrorUtils } from './error-utils';
-import { BusinessRuleError } from './business-rule-error';
+import { BusinessRuleError } from '../../types/src/errors/business-rule-error';
 import {
   GeneralErrorCode,
   GeneralErrorCodeImpl,
-} from './general-error-code.enum';
-import { ErrorDto, ErrorDtoBuilder } from '../dto/error.dto';
-import { StringUtils } from '@goldy/shared/utils';
+} from '../../types/src/errors/general-error-code.enum';
+import { ErrorDto, ErrorDtoBuilder } from '../../types/src/dto/error.dto';
+import { StringUtils } from './string-utils';
 
 describe('ErrorUtils', () => {
   describe('findError', () => {

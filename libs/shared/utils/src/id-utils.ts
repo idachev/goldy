@@ -71,7 +71,7 @@ export class IDUtils {
 
     const bytes = new Uint8Array(16);
     for (let i = 0; i < 16; i++) {
-      bytes[i] = parseInt(cleanUuid.substr(i * 2, 2), 16);
+      bytes[i] = parseInt(cleanUuid.substring(i * 2, i * 2 + 2), 16);
     }
 
     return bytes;
@@ -90,11 +90,11 @@ export class IDUtils {
       .join('');
 
     return [
-      hex.substr(0, 8),
-      hex.substr(8, 4),
-      hex.substr(12, 4),
-      hex.substr(16, 4),
-      hex.substr(20, 12),
+      hex.substring(0, 8),
+      hex.substring(8, 12),
+      hex.substring(12, 16),
+      hex.substring(16, 20),
+      hex.substring(20, 32),
     ].join('-');
   }
 

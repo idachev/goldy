@@ -50,7 +50,7 @@ export class ScraperService {
         results.push({
           listingId: listing.id,
           success: false,
-          error: error.message,
+          error: error instanceof Error ? error.message : String(error),
         });
         this.logger.error(`Failed to scrape listing ${listing.id}:`, error);
       }

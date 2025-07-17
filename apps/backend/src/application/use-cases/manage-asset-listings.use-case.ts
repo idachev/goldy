@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { AssetListingDto } from '@goldy/shared/types';
-import { ErrorUtils } from '@goldy/shared/types';
-import { IDUtils } from '@goldy/shared/utils';
+import { ErrorUtils, IDUtils } from '@goldy/shared/utils';
 import { AssetListingRepository } from '../../infrastructure/database/typeorm/repositories/asset-listing.repository';
 import { AssetRepository } from '../../infrastructure/database/typeorm/repositories/asset.repository';
 import { DealerRepository } from '../../infrastructure/database/typeorm/repositories/dealer.repository';

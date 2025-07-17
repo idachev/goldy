@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PriceRecordDto } from '@goldy/shared/types';
-import { ErrorUtils } from '@goldy/shared/types';
-import { PriceCalculator, IDUtils } from '@goldy/shared/utils';
+import { PriceCalculator, ErrorUtils, IDUtils } from '@goldy/shared/utils';
 import { PriceRecordRepository } from '../../infrastructure/database/typeorm/repositories/price-record.repository';
 import { PriceRecord } from '../../domain/entities/price-record.entity';
 import { AssetListing } from '../../domain/entities/asset-listing.entity';

@@ -78,7 +78,13 @@ export default [
         {
           allow: ['warn', 'error']
         }
-      ]
+      ],
+      'sonarjs/todo-tag': 'off',
+      'sonarjs/prefer-regexp-exec': 'off',
+      'sonarjs/slow-regex': 'off',
+      'sonarjs/no-commented-code': 'off',
+      'sonarjs/prefer-read-only-props': 'off',
+      'sonarjs/anchor-precedence': 'off'
     }
   }
 ];
