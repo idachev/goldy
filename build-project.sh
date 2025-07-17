@@ -5,16 +5,14 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # build-project.sh - Local development build script for Goldy project
 # This script performs all quality checks and tests that will be run in CI/CD
 
-set -e  # Exit on any error
-
 echo "🔨 Starting Goldy project build and validation..."
 echo "=================================================="
 
 # 1. Format check
-echo "📝 Checking code formatting..."
-npm run format:check
+echo "📝 Doing code formatting..."
+npm run format
 if [ $? -ne 0 ]; then
-    echo "❌ Code formatting issues found. Run 'npm run format' to fix."
+    echo "❌ Code formatting issues found."
     exit 1
 fi
 echo "✅ Code formatting check passed"

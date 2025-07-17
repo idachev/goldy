@@ -20,7 +20,8 @@ export default [
       'next.config.js',
       '*.mjs',
       '*.cjs',
-      '**/*.js'
+      '**/*.js',
+      '**/.next/**'
     ]
   },
   js.configs.recommended,
