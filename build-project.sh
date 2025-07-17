@@ -2,9 +2,6 @@
 [ "$1" = -x ] && shift && set -x
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# build-project.sh - Local development build script for Goldy project
-# This script performs all quality checks and tests that will be run in CI/CD
-
 echo "🔨 Starting Goldy project build and validation..."
 echo "=================================================="
 
@@ -15,7 +12,7 @@ if [ $? -ne 0 ]; then
     echo "❌ Code formatting issues found."
     exit 1
 fi
-echo "✅ Code formatting check passed"
+echo "✅ Code formatting passed"
 
 # 2. Lint check
 echo "🔍 Running ESLint..."
@@ -55,7 +52,7 @@ echo "✅ All projects built successfully"
 
 # 6. Run all tests
 echo "🧪 Running all tests..."
-npm run test
+npm run test:coverage
 if [ $? -ne 0 ]; then
     echo "❌ Tests failed."
     exit 1

@@ -2,6 +2,25 @@ import { StringUtils } from './string-utils';
 import { v4 as uuidv4 } from 'uuid';
 
 describe('StringUtils', () => {
+  describe('constructor', () => {
+    it('should throw error when trying to instantiate', () => {
+      expect(() => new (StringUtils as any)()).toThrow('Utility class');
+    });
+  });
+
+  describe('toUuid exception handling', () => {
+    it('should handle exceptions gracefully', () => {
+      const mockString = 'a4f47ac1-7f20-4d93-9d42-123456789012';
+      jest.spyOn(RegExp.prototype, 'test').mockImplementationOnce(() => {
+        throw new Error('Regex error');
+      });
+
+      const result = StringUtils.toUuid(mockString);
+      expect(result).toBeNull();
+
+      jest.restoreAllMocks();
+    });
+  });
   describe('hideString', () => {
     it('should handle null and empty strings', () => {
       expect(StringUtils.hideString('')).toBe('');
