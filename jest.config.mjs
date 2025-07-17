@@ -50,6 +50,8 @@ const config = {
     '!**/*.spec.ts',
     '!**/*.test.ts',
     '!**/*.d.ts',
+    '!**/*.enum.ts',
+    '!**/lib/*.ts',
   ],
   coverageReporters: ['text', 'lcov'],
 };
