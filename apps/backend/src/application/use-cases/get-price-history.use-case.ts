@@ -2,15 +2,18 @@ import { Injectable } from '@nestjs/common';
 import { PriceRecordDto } from '@goldy/shared/types';
 import { PriceCalculator, ErrorUtils, IDUtils } from '@goldy/shared/utils';
 import { PriceRecordRepository } from '../../infrastructure/database/typeorm/repositories/price-record.repository';
+import { AssetListingRepository } from '../../infrastructure/database/typeorm/repositories/asset-listing.repository';
 import { PriceRecord } from '../../domain/entities/price-record.entity';
-import { AssetListing } from '../../domain/entities/asset-listing.entity';
 
 const { isValidArgument } = ErrorUtils;
 const { isValidId } = IDUtils;
 
 @Injectable()
 export class GetPriceHistoryUseCase {
-  constructor(private readonly priceRecordRepository: PriceRecordRepository) {}
+  constructor(
+    private readonly priceRecordRepository: PriceRecordRepository,
+    private readonly assetListingRepository: AssetListingRepository
+  ) {}
 
   async getAllPriceRecords(): Promise<PriceRecordDto[]> {
     const records = await this.priceRecordRepository.findAll();
@@ -116,10 +119,13 @@ export class GetPriceHistoryUseCase {
           )
         : undefined;
 
-    // TODO: This should ideally fetch the full AssetListing entity first
-    // For now, we're passing a partial object with just the ID
+    const assetListing = await this.assetListingRepository.findById(
+      priceData.assetListingId
+    );
+    isValidArgument(!!assetListing, 'Asset listing not found');
+
     const record = await this.priceRecordRepository.create({
-      assetListing: { id: priceData.assetListingId } as AssetListing,
+      assetListing,
       sellPrice: priceData.sellPrice,
       buyPrice: priceData.buyPrice,
       spotPrice: priceData.spotPrice,

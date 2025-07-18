@@ -31,12 +31,18 @@ export class PriceAnalyzerService {
   constructor(private readonly priceRecordRepository: PriceRecordRepository) {}
 
   async comparePricesAcrossDealers(
-    assetId?: string
+    assetId?: string,
+    metalType?: string
   ): Promise<PriceComparison[]> {
     const latestPrices = await this.priceRecordRepository.findLatestPrices();
 
     return latestPrices
-      .filter((record) => !assetId || record.assetListing.asset.id === assetId)
+      .filter((record) => {
+        return (
+          (!assetId || record.assetListing.asset.id === assetId) &&
+          (!metalType || record.assetListing.asset.metalType === metalType)
+        );
+      })
       .map((record) => {
         const asset = record.assetListing.asset;
         const dealer = record.assetListing.dealer;
@@ -122,14 +128,10 @@ export class PriceAnalyzerService {
     metalType?: string,
     limit: number = 10
   ): Promise<PriceComparison[]> {
-    const comparisons = await this.comparePricesAcrossDealers();
-
-    // TODO: Implement metalType filtering when asset metadata is available
-    // .filter((comp) => {
-    //   if (!metalType) return true;
-    //   // This would need asset metadata to filter by metal type
-    //   return comp.metalType === metalType;
-    // })
+    const comparisons = await this.comparePricesAcrossDealers(
+      undefined,
+      metalType
+    );
 
     return comparisons
       .filter((comp) => comp.inStock && comp.premiumPercent !== undefined)

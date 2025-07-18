@@ -1,110 +1,196 @@
 # Goldy
 
+Physical precious metals investment tracker that scrapes real-time prices from multiple dealers and provides price comparison analytics.
+
+## Overview
+
+Goldy is a monorepo application built with Nx that helps precious metals investors track prices, compare deals across dealers, and monitor their investment portfolios. The system automatically scrapes price data from dealer websites and provides comprehensive analytics.
+
+### Key Features
+
+- **Multi-Dealer Price Tracking**: Automated scraping of gold/silver prices from various dealers
+- **Price Comparison**: Compare premiums and find the best deals across dealers
+- **Asset Management**: Track different precious metal products (coins, bars, rounds)
+- **Historical Analysis**: Price trend analysis and historical data tracking
+- **REST API**: Complete API for integration with external systems
+
+### Architecture
+
+- **Backend**: NestJS with clean architecture (domain/application/infrastructure/presentation layers)
+- **Frontend**: Next.js 14 with React 19, Tailwind CSS, Recharts for visualization
+- **Database**: SQLite with TypeORM
+- **Scraping**: Puppeteer + Cheerio for automated price collection
+- **Shared Libraries**: TypeScript libraries for types and utilities
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- npm or yarn
+
+### Development Setup
+
+1. **Install dependencies:**
+
+```bash
+npm install
+```
+
+2. **Build shared libraries:**
+
+```bash
+npx nx build types
+npx nx build utils
+```
+
+3. **Start development servers:**
+
+**Backend only:**
+
+```bash
+npx nx serve backend
+```
+
+**Frontend only:**
+
+```bash
+npx nx dev frontend
+```
+
+**Both simultaneously:**
+
+```bash
+# Option 1: Run in parallel
+npx nx run-many --target=serve --projects=backend,frontend --parallel
+
+# Option 2: Use separate terminals
+# Terminal 1: npx nx serve backend
+# Terminal 2: npx nx dev frontend
+```
+
+### Development Workflow
+
+For active development with auto-rebuild of shared libraries:
+
+```bash
+# Terminal 1: Watch shared libraries
+npx nx build types --watch & npx nx build utils --watch
+
+# Terminal 2: Start backend
+npx nx serve backend
+
+# Terminal 3: Start frontend
+npx nx dev frontend
+```
+
+### Available Commands
+
+**Code Quality:**
+
+```bash
+npm run lint              # Run ESLint with SonarJS rules
+npm run lint:fix          # Auto-fix linting issues
+npm run format            # Format code with Prettier
+npm run format:check      # Check formatting without changes
+```
+
+**Testing:**
+
+```bash
+npx nx test backend-e2e   # Backend integration tests
+npx nx e2e frontend-e2e   # Frontend E2E tests (Playwright)
+```
+
+**Building:**
+
+```bash
+npx nx build backend      # Build backend for production
+npx nx build frontend     # Build frontend for production
+npx nx typecheck          # Run TypeScript checking
+```
+
+### API Endpoints
+
+The backend provides REST API endpoints:
+
+- **Assets**: `/api/assets/*` - CRUD operations for precious metal products
+- **Dealers**: `/api/dealers/*` - Dealer management and configuration
+- **Asset Listings**: `/api/asset-listings/*` - Product listings per dealer
+- **Prices**: `/api/prices/*` - Price history and latest pricing data
+- **Scraping**: `/api/scraping/*` - Manual scraping triggers and status
+
+### Project Structure
+
+```
+apps/
+├── backend/              # NestJS API with clean architecture
+├── frontend/             # Next.js React application
+├── backend-e2e/          # Backend integration tests
+└── frontend-e2e/         # Frontend E2E tests
+
+libs/shared/
+├── types/                # DTOs, enums shared across apps
+└── utils/                # Utilities (price calculators, converters)
+```
+
+## Nx Workspace
+
 <a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
+This project is built with [Nx](https://nx.dev), a powerful build system for monorepos.
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/nx-api/js?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+### Nx Commands
 
-## Generate a library
+**Explore the workspace:**
 
-```sh
-npx nx g @nx/js:lib packages/pkg1 --publishable --importPath=@my-org/pkg1
+```bash
+npx nx graph                    # Visualize project dependencies
+npx nx show project backend     # Show backend project details
+npx nx show project frontend    # Show frontend project details
+npx nx list                     # List all available plugins and commands
 ```
 
-## Run tasks
+**Run multiple projects:**
 
-To build the library use:
-
-```sh
-npx nx build pkg1
+```bash
+npx nx run-many --target=build --all                    # Build all projects
+npx nx run-many --target=test --projects=backend,types  # Test specific projects
+npx nx run-many --target=lint --parallel               # Lint all projects in parallel
 ```
 
-To run any task with Nx use:
+**Workspace management:**
 
-```sh
-npx nx <target> <project-name>
+```bash
+npx nx sync                     # Sync TypeScript project references
+npx nx sync:check              # Verify TypeScript references (for CI)
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+### Development Tools
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+**Nx Console (Recommended):**
 
-## Versioning and releasing
+- VS Code extension for running Nx commands via GUI
+- Provides project visualization and code generation
+- [Install Nx Console](https://nx.dev/getting-started/editor-setup)
 
-To version and release the library use
+**TypeScript Integration:**
+Nx automatically manages TypeScript project references. The sync happens during build/typecheck, but you can manually sync:
 
-```
-npx nx release
-```
-
-Pass `--dry-run` to see what would happen without actually releasing the library.
-
-[Learn more about Nx release &raquo;](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Keep TypeScript project references up to date
-
-Nx automatically updates TypeScript [project references](https://www.typescriptlang.org/docs/handbook/project-references.html) in `tsconfig.json` files to ensure they remain accurate based on your project dependencies (`import` or `require` statements). This sync is automatically done when running tasks such as `build` or `typecheck`, which require updated references to function correctly.
-
-To manually trigger the process to sync the project graph dependencies information to the TypeScript project references, run the following command:
-
-```sh
+```bash
 npx nx sync
 ```
 
-You can enforce that the TypeScript project references are always in the correct state when running in CI by adding a step to your CI job configuration that runs the following command:
+### Nx Resources
 
-```sh
-npx nx sync:check
-```
+**Learn more:**
 
-[Learn more about nx sync](https://nx.dev/reference/nx-commands#sync)
+- [Nx workspace setup documentation](https://nx.dev/nx-api/js)
+- [Running tasks with Nx](https://nx.dev/features/run-tasks)
+- [Nx plugins ecosystem](https://nx.dev/concepts/nx-plugins)
 
-## Set up CI!
-
-### Step 1
-
-To connect to Nx Cloud, run the following command:
-
-```sh
-npx nx connect
-```
-
-Connecting to Nx Cloud ensures a [fast and scalable CI](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
-
-- [Remote caching](https://nx.dev/ci/features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/ci/features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/ci/features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-### Step 2
-
-Use the following command to configure a CI workflow for your workspace:
-
-```sh
-npx nx g ci-workflow
-```
-
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Install Nx Console
-
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
-
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Useful links
-
-Learn more:
-
-- [Learn more about this workspace setup](https://nx.dev/nx-api/js?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-And join the Nx community:
+**Community:**
 
 - [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+- [Twitter/X](https://twitter.com/nxdevtools)
+- [YouTube Channel](https://www.youtube.com/@nxdevtools)
